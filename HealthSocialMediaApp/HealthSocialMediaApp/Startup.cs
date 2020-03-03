@@ -37,14 +37,14 @@ namespace HealthSocialMediaApp
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
             services.AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    IConfigurationSection googleAuthSection = Configuration.GetSection("Authentication:Google");
+                // .AddGoogle(options =>
+                // {
+                //     IConfigurationSection googleAuthSection = Configuration.GetSection("Authentication:Google");
 
-                    options.ClientId = googleAuthSection["ClientId"];
-                    options.ClientSecret = googleAuthSection["ClientSecret"];
+                //     options.ClientId = googleAuthSection["ClientId"];
+                //     options.ClientSecret = googleAuthSection["ClientSecret"];
 
-                })
+                // })
                 .AddIdentityServerJwt();
 
             services.AddControllersWithViews();
