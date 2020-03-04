@@ -8,5 +8,6 @@ namespace HealthSocialMediaApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        
     }
 }

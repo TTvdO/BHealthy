@@ -29,8 +29,8 @@ namespace HealthSocialMediaApp
         {
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+            );
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -45,7 +45,6 @@ namespace HealthSocialMediaApp
 
                     options.ClientId = googleAuthSection["ClientId"];
                     options.ClientSecret = googleAuthSection["ClientSecret"];
-
                 })
                 .AddIdentityServerJwt();
 
