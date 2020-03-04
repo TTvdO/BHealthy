@@ -6,17 +6,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthSocialMediaApp.Models;
+using HealthSocialMediaApp.Data;
 
 namespace HealthSocialMediaApp.Controllers
 {
-    /*
+    
     [Route("api/[controller]")]
     [ApiController]
     public class PostsController : ControllerBase
     {
-        //private readonly HealthSocialMediaAppContext _context;
-        /*
-        public PostsController(HealthSocialMediaAppContext context)
+        private readonly ApplicationDbContext _context;
+        
+        public PostsController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -107,5 +108,4 @@ namespace HealthSocialMediaApp.Controllers
             return _context.Posts.Any(e => e.Id == id);
         }
     }
-    */
 }

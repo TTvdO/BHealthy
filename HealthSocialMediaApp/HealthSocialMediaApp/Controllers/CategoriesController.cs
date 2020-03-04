@@ -6,18 +6,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthSocialMediaApp.Models;
+using HealthSocialMediaApp.Data;
 
 namespace HealthSocialMediaApp.Controllers
 {
-    /*
+    
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
         
-        private readonly HealthSocialMediaAppContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public CategoriesController(HealthSocialMediaAppContext context)
+        public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -107,5 +108,5 @@ namespace HealthSocialMediaApp.Controllers
         {
             return _context.Categories.Any(e => e.Id == id);
         }
-    }*/
+    }
 }

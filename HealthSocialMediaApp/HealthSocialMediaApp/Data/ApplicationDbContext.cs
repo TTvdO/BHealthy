@@ -17,5 +17,7 @@ namespace HealthSocialMediaApp.Data
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
         }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Post> Posts { get; set; }
     }
 }
