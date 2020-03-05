@@ -1,14 +1,15 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { LoginMenu } from "./api-authorization/LoginMenu";
 
 import {
-	AppBar,
+    AppBar,
 	Toolbar,
 	Typography,
 	Container,
 	Button
 } from "@material-ui/core";
+
+import { LoginMenu } from "./api-authorization/LoginMenu";
 
 const Layout = ({ children }) => {
 	return (

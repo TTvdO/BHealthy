@@ -18,9 +18,13 @@ namespace HealthSocialMediaApp
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            .ConfigureAppConfiguration((HostingAbstractionsHostExtensions, config) =>
+            {
+                config.AddJsonFile("localsettings.json", optional: false, reloadOnChange: true);
+            })
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
     }
 }

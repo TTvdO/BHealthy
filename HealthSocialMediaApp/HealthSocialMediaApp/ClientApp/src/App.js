@@ -5,8 +5,6 @@ import { Home } from "./components/Home";
 import ApiAuthorizationRoutes from "./components/api-authorization/ApiAuthorizationRoutes";
 import { ApplicationPaths } from "./components/api-authorization/ApiAuthorizationConstants";
 
-import "./custom.css";
-
 export default class App extends Component {
 	static displayName = App.name;
 
