@@ -2,21 +2,25 @@ import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import {
-    AppBar,
-	Toolbar,
-	Typography,
+	AppBar,
+	Button,
+	CssBaseline,
 	Container,
-	Button
+	Toolbar,
+	Typography
 } from "@material-ui/core";
 
 import { LoginMenu } from "./api-authorization/LoginMenu";
 
+import "typeface-roboto";
+
 const Layout = ({ children }) => {
 	return (
 		<>
-			<AppBar position="fixed">
+			<CssBaseline />
+			<AppBar position="sticky">
 				<Toolbar>
-					<Typography variant="h6">HealthSocialMediaApp</Typography>
+					<Typography variant="h6">BHealthy</Typography>
 					<Button component={RouterLink} to="/" color="inherit">
 						Home
 					</Button>
@@ -25,7 +29,7 @@ const Layout = ({ children }) => {
 				</Toolbar>
 			</AppBar>
 
-			<Container maxWidth="lg">{children}</Container>
+			<Container maxWidth="md">{children}</Container>
 		</>
 	);
 };

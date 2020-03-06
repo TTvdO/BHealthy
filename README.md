@@ -1,20 +1,73 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Introduction
+
+BHealthy aims to improve the lives of health enthusiasts.
 
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+
+## Installation process
+
+### 1. Clone the repository
+
+Over http
+
+```bash
+git clone https://hhs-se-s6@dev.azure.com/hhs-se-s6/Group%204/_git/Group%204
+```
+
+Over ssh
+
+```bash
+git clone git@ssh.dev.azure.com:v3/hhs-se-s6/Group%204/Group%204
+```
+
+### 2. Initialize user secrets.
+
+Used for the Google Authentication API. Replace CLIENT_ID and CLIENT_SECRET with the development API key's for Google Authentication. Contact an administrator to gain access.
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "Authentication:Google:ClientId" "CLIENT_ID"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "CLIENT_SECRET"
+```
+
+### 3. Initialize to a local development database
+
+Run this command in the same directory where the HealthSocialMediaApp.csproj is located to set up a connection to your local database server.
+
+```bash
+echo "{\"ConnectionStrings\": {\"DefaultConnection\": \"Server=localhost;Database=BHealthy;User Id=;Password=\"}}" >localsettings.json
+```
+
+Install entity framework and create the database.
+
+```bash
+dotnet tool install --global dotnet-ef
+dotnet ef database update
+```
+
+### 4. Install dependencies
+
+Restore NuGet packages.
+
+```bash
+dotnet restore
+```
+
+Install NPM packages for the Single Page Application frontend.
+
+```bash
+cd ClientApp
+npm install
+```
+
+### 5. Run the application
+
+Run while watching for file changes.
+
+```
+dotnet watch run
+```
 
 # Build and Test
-TODO: Describe and show how to build your code and run the tests. 
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
-
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+TODO: Describe and show how to build your code and run the tests.

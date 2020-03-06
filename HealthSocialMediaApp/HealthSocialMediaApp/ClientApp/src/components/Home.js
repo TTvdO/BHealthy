@@ -1,42 +1,51 @@
 import React, { useState, useEffect } from "react";
 
+import authService from "./api-authorization/AuthorizeService";
+
 import { Typography } from "@material-ui/core";
 
 const Home = () => {
 	const [data, setData] = useState({
-		post: {},
+		users: [],
 		isLoading: false,
 		error: undefined
 	});
 
 	useEffect(() => {
-		setData({ post: {}, isLoading: true, error: undefined });
-		fetch("/api/posts/1")
-			.then(response => {
-				return response.json();
+		setData({ users: [], isLoading: true, error: undefined });
+		authService.getAccessToken().then(token => {
+			// Send authorization token so the backend can verify the user.
+			fetch("/api/users", {
+				headers: !token ? {} : { Authorization: `Bearer ${token}` }
 			})
-			.then(post => {
-				setData({ post, isLoading: false, error: undefined });
-			})
-			.catch(error => {
-				setData({
-					post: {},
-					isLoading: false,
-					error
+				.then(response => {
+					return response.json();
+				})
+				.then(user => {
+					setData({
+						users: user,
+						isLoading: false,
+						error: undefined
+					});
+				})
+				.catch(error => {
+					setData({
+						users: {},
+						isLoading: false,
+						error
+					});
 				});
-			});
+		});
 	}, [setData]);
 
 	return (
 		<>
-			{data.isLoading && (
-				<Typography>Loading Typographyost 1...</Typography>
-			)}
+			{data.isLoading && <Typography>Loading user count...</Typography>}
 			{!data.isLoading && data.error && (
-				<Typography>Could not fetch post 1</Typography>
+				<Typography>Could not fetch user count</Typography>
 			)}
 			{!data.isLoading && !data.error && (
-				<Typography>Post 1: {data.post.description},</Typography>
+				<Typography>Total users: {data.users.length}</Typography>
 			)}
 		</>
 	);

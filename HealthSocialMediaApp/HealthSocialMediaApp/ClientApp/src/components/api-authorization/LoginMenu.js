@@ -3,7 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import authService from "./AuthorizeService";
 import { ApplicationPaths } from "./ApiAuthorizationConstants";
 
-import { Button, Typography } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 
 export class LoginMenu extends Component {
 	constructor(props) {
@@ -55,7 +55,7 @@ export class LoginMenu extends Component {
 		return (
 			<>
 				<Button component={RouterLink} to={profilePath} color="inherit">
-					Hello {userName}
+					{userName}
 				</Button>
 
 				<Button component={RouterLink} to={logoutPath} color="inherit">
