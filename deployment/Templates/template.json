@@ -53,8 +53,9 @@
       "location": "[parameters('location')]",
       "tags": null,
       "dependsOn": [
-        "microsoft.insights/components/BHealthy-testing",
-        "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+        "microsoft.insights/components/bhealthy-insights",
+        "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+        "microsoft.sql/servers/bhealthy-sql-server"
       ],
       "properties": {
         "name": "[parameters('name')]",
@@ -62,11 +63,11 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference('microsoft.insights/components/BHealthy-testing', '2015-05-01').InstrumentationKey]"
+              "value": "[reference('microsoft.insights/components/bhealthy-insights', '2015-05-01').InstrumentationKey]"
             },
             {
               "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-              "value": "[reference('microsoft.insights/components/BHealthy-testing', '2015-05-01').ConnectionString]"
+              "value": "[reference('microsoft.insights/components/bhealthy-insights', '2015-05-01').ConnectionString]"
             },
             {
               "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
@@ -140,7 +141,7 @@
     },
     {
       "apiVersion": "2015-05-01",
-      "name": "BHealthy-testing",
+      "name": "bhealthy-insights",
       "type": "microsoft.insights/components",
       "location": "westeurope",
       "tags": null,
@@ -148,6 +149,52 @@
         "ApplicationId": "[parameters('name')]",
         "Request_Source": "IbizaWebAppExtensionCreate"
       }
+    },
+    {
+        "name": "bhealthy-sql-server",
+        "type": "Microsoft.Sql/servers",
+        "apiVersion": "2015-05-01-preview",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "displayName": "bhealthy-sql-server"
+        },
+        "properties": {
+            "administratorLogin": "$(sqlServerAdminLogin)",
+            "administratorLoginPassword": "$(sqlServerAdminPassword)"
+        },
+        "resources": [
+            {
+                "type": "firewallRules",
+                "apiVersion": "2015-05-01-preview",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Sql/servers', 'bhealthy-sql-server')]"
+                ],
+                "location": "[resourceGroup().location]",
+                "name": "AllowAllWindowsAzureIps",
+                "properties": {
+                    "startIpAddress": "0.0.0.0",
+                    "endIpAddress": "0.0.0.0"
+                }
+            }
+        ]
+    },
+    {
+        "name": "bhealthy-sql-server/bhealthy-database",
+        "type": "Microsoft.Sql/servers/databases",
+        "apiVersion": "2014-04-01",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "displayName": "bhealthy-database"
+        },
+        "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', 'bhealthy-sql-server')]"
+        ],
+        "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "edition": "Basic",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "Basic"
+        }
     }
   ]
 }

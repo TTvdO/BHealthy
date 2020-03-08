@@ -6,7 +6,7 @@
       "value": "4c75ca77-8e89-4a91-9cc0-9bc76d3a6693"
     },
     "name": {
-      "value": "BHealthy-testing"
+      "value": "bhealthy-social-media-app"
     },
     "location": {
       "value": "West Europe"
@@ -42,7 +42,7 @@
       "value": "dotnetcore"
     },
     "errorLink": {
-      "value": "https://BHealthy-testing.scm.azurewebsites.net/detectors"
+      "value": "https://bhealthy-social-media-app.scm.azurewebsites.net/detectors"
     }
   }
 }
