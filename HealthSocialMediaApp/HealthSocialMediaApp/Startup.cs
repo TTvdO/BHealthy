@@ -11,15 +11,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using HealthSocialMediaApp.Data;
-
+using Microsoft.AspNetCore.Http;
 
 namespace HealthSocialMediaApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _currentEnvironment;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _currentEnvironment = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -56,6 +59,14 @@ namespace HealthSocialMediaApp
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            if(_currentEnvironment.IsDevelopment()) {
+                services.AddHttpsRedirection(options =>
+                {
+                    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                    options.HttpsPort = 5001;
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
