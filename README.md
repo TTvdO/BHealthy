@@ -22,7 +22,7 @@ git clone git@ssh.dev.azure.com:v3/hhs-se-s6/Group%204/Group%204
 
 ### 2. Initialize user secrets.
 
-Used for the Google Authentication API. Replace CLIENT_ID and CLIENT_SECRET with the development API key's for Google Authentication. Contact an administrator to gain access.
+Used for the Google Authentication API. Replace CLIENT_ID and CLIENT_SECRET with the development API key's for Google Authentication.
 
 ```bash
 dotnet user-secrets init
@@ -32,10 +32,10 @@ dotnet user-secrets set "Authentication:Google:ClientSecret" "CLIENT_SECRET"
 
 ### 3. Initialize to a local development database
 
-Run this command in the same directory where the HealthSocialMediaApp.csproj is located to set up a connection to your local database server.
+Run this command in the same directory where in HealthSocialMediaApp.csproj is located to set up a connection to your local database server with the connection string.
 
 ```bash
-echo "{\"ConnectionStrings\": {\"DefaultConnection\": \"Server=localhost;Database=BHealthy;User Id=;Password=\"}}" >localsettings.json
+echo '{"ConnectionStrings": {"DefaultConnection": "Server=localhost;Database=BHealthy;User Id=;Password="}}' >localsettings.json
 ```
 
 Install entity framework and create the database.

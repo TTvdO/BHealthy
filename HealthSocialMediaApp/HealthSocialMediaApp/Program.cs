@@ -20,7 +20,7 @@ namespace HealthSocialMediaApp
             Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((HostingAbstractionsHostExtensions, config) =>
             {
-                config.AddJsonFile("localsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
+                config.AddJsonFile("localsettings.json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
