@@ -56,10 +56,8 @@ const Posts = () => {
 
 	useEffect(() => {
 		setData({ posts: [], isLoading: true, error: undefined });
-		// Send authorization token so the backend can verify the user.
-		fetch("/api/posts", {
-			//headers: !token ? {} : { Authorization: `Bearer ${token}` }
-		})
+
+		fetch("/api/posts", {})
 			.then(response => {
 				return response.json();
 			})
@@ -89,7 +87,7 @@ const Posts = () => {
 								aria-label="recipe"
 								className={classes.avatar}
 							>
-								JD
+								{item.userName[0] + item.userName[1]}
 							</Avatar>
 						}
 						action={
@@ -97,7 +95,7 @@ const Posts = () => {
 								<MoreVertIcon />
 							</IconButton>
 						}
-						title="John Doe"
+						title={item.userName}
 						subheader={item.createdAt}
 					/>
 					<CardMedia
@@ -119,13 +117,13 @@ const Posts = () => {
 							<FavoriteIcon />
 						</IconButton>
 						{/*
-						// We can use this code for a share feature later 
+						// We can use this code for a share feature later
 						<IconButton aria-label="share">
 							<ShareIcon />
 						</IconButton>
 						*/}
 						{/*
-						// We can use this code for comments later 
+						// We can use this code for comments later
 						<IconButton
 							className={clsx(classes.expand, {
 								[classes.expandOpen]: expanded
@@ -138,7 +136,7 @@ const Posts = () => {
 						</IconButton> */}
 					</CardActions>
 					{/*
-						// We can use this code for comments later 
+						// We can use this code for comments later
 					<Collapse in={expanded} timeout="auto" unmountOnExit>
 						<CardContent>
 							<Typography paragraph>Comments:</Typography>

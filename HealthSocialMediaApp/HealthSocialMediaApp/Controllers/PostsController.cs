@@ -24,9 +24,18 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPosts()
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts()
         {
-            return await _context.Posts.ToListAsync();
+            var post = await (from p in _context.Posts
+                       select new {
+                           p.Id, p.ImageLink,
+                           p.Description,
+                           p.CategoryId,
+                           p.CreatedAt,
+                           p.ApplicationUser.UserName,
+                           p.ApplicationUserId
+                       }).ToListAsync();
+            return post;
         }
 
         // GET: api/Posts/5
