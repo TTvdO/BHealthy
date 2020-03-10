@@ -5,9 +5,9 @@ import {
 	AppBar,
 	Button,
 	CssBaseline,
-	Container,
 	Toolbar,
-	Typography
+	Typography,
+	Container
 } from "@material-ui/core";
 
 import { LoginMenu } from "./api-authorization/LoginMenu";

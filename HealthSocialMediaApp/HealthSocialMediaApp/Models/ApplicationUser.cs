@@ -8,12 +8,8 @@ namespace HealthSocialMediaApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        //Id, Email and UserName already exist within IdentityUser
-
-        public override string UserName { get; set; }
-
         public string Description { get; set; }
 
-        public DateTime Birthday { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
     }
 }

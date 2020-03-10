@@ -15,7 +15,7 @@ const Home = () => {
 		setData({ users: [], isLoading: true, error: undefined });
 		authService.getAccessToken().then(token => {
 			// Send authorization token so the backend can verify the user.
-			fetch("/api/users", {
+			fetch("/api/applicationusers", {
 				headers: !token ? {} : { Authorization: `Bearer ${token}` }
 			})
 				.then(response => {

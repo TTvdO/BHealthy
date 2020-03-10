@@ -1,120 +1,135 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Button, Box, TextField } from "@material-ui/core";
+import authService from "./api-authorization/AuthorizeService";
 
 const ApplicationUser = () => {
-	//TODO: https://stackoverflow.com/questions/55923610/is-there-any-way-to-update-multiple-usestatereact-hook-or-multiple-properties
-	//multiple values useState
-	const [state, setState] = useState({
-		id: "",
-		email: "",
-		username: "",
-		description: "",
-		birthday: ""
+	const [applicationUserData, setApplicationUserData] = useState({
+		user: {},
+		isLoading: false,
+		error: null
 	});
 
-	const [temp, setTemp] = useState("");
+	useEffect(() => {
+		setApplicationUserData({ user: {}, isLoading: true, error: undefined });
+		authService.getAccessToken().then(token => {
+			authService.getUser().then(user => {
+				console.log("user", user);
+				fetch(`/api/applicationusers/${user.sub}`, {
+					headers: !token
+						? {}
+						: {
+								Authorization: `Bearer ${token}`,
+								"Content-Type": "application/json;charset=utf-8"
+						  }
+				})
+					.then(response => {
+						return response.json();
+					})
+					.then(user => {
+						setApplicationUserData({
+							user: user,
+							isLoading: false,
+							error: undefined
+						});
+					})
+					.catch(error => {
+						setApplicationUserData({
+							user: {},
+							isLoading: false,
+							error
+						});
+					});
+			});
+		});
+	}, [setApplicationUserData]);
 
-	const handleState = () => {
-		// setState(givenEmail => this.email);
-	};
-
-	console.log("temp", temp);
-
-	// if (blabla) {
-	//     return <div>Account created</div>
-	// }
-
-	const submitValue = () => {
-		const formDetails = {
-			id: state.id,
-			email: state.email,
-			username: state.username,
-			description: state.description,
-			birthday: state.birthday
-		};
+	const updateUserAttributes = () => {
+		authService.getAccessToken().then(token => {
+			// Send authorization token so the backend can verify the user.
+			authService.getUser().then(user => {
+				console.log("user", user);
+				fetch(`/api/applicationusers/${user.sub}`, {
+					method: "PUT",
+					body: JSON.stringify(applicationUserData.user),
+					headers: !token
+						? {}
+						: {
+								Authorization: `Bearer ${token}`,
+								"Content-Type": "application/json;charset=utf-8"
+						  }
+				});
+			});
+		});
 	};
 
 	return (
-		//moet je vervormen tot useState
-		//const { id, username, } = this.state
-
-		<div>
-			<form>
-				<label>temp </label>
-				<input
-					type="text"
-					placeholder="..."
-					onChange={e => setTemp(e.target.value)}
-					style={{ display: "block" }}
-				/>
-				<label>temp </label>
-				<input
-					type="text"
-					placeholder="..."
-					onChange={e => setTemp(e.target.value)}
-					style={{ display: "block" }}
-				/>
-				<label>temp </label>
-				<input
-					type="text"
-					placeholder="..."
-					onChange={e => setTemp(e.target.value)}
-					style={{ display: "block" }}
-				/>
-				<label>ID </label>
-				<input
-					type="text"
-					placeholder="..."
-					onChange={e =>
-						setState({
-							...state,
-							id: e.target.value
-						})
-					}
-					value={state.id}
-					style={{ display: "block" }}
-				/>
-				<label>Email </label>
-				<input
-					type="text"
-					placeholder="..."
-					onChange={e =>
-						setState(previousState => ({
-							...previousState,
-							email: e.target.value
-						}))
-					}
-					style={{ display: "block" }}
-				/>
-				<label>Username </label>
-				<input
-					type="text"
-					name="username"
-					//value={username}
-					style={{ display: "block" }}
-				/>
-				<label>Description </label>
-				<input
-					type="text"
-					name="description"
-					//value={description}
-					style={{ display: "block" }}
-				/>
-				<label>Birthday </label>
-				<input
-					type="text"
-					name="birthday"
-					//value={birthday}
-					style={{ display: "block" }}
-				/>
-				{/* wanneer je op submit klikt moet je verwezen worden naar de Read van de CRUD operaties en moeten de waardes die je hebt opgegeven 
-                mee worden gegeven. in de READ
-                pagina wacht je met een HttpGet method en pak je de waardes daar. later met database */}
-				{/* zie: https://stackoverflow.com/questions/49738249/react-router-v4-redirecting-on-form-submit */}
-
-				{/* conditional rendering, inline if with logical && operator */}
-				<button onClick={submitValue}>Submit</button>
-			</form>
-		</div>
+		<form noValidate autocomplete="off">
+			<Box display="flex" flexDirection="column">
+				<label for="id-label">ID</label>
+				<TextField
+					id="id-label"
+					variant="filled"
+					inputProps={{ disabled: true }}
+					value={applicationUserData.user.id}
+					onChange={e => {
+						setApplicationUserData({
+							...applicationUserData,
+							user: {
+								...applicationUserData.user,
+								id: e.target.value
+							}
+						});
+					}}
+				></TextField>
+				<label for="email-label">Email</label>
+				<TextField
+					id="email-label"
+					variant="filled"
+					inputProps={{ disabled: true }}
+					value={applicationUserData.user.email}
+					onChange={e => {
+						setApplicationUserData({
+							...applicationUserData,
+							user: {
+								...applicationUserData.user,
+								email: e.target.value
+							}
+						});
+					}}
+				></TextField>
+				<label for="username-label">Username</label>
+				<TextField
+					id="username-label"
+					value={applicationUserData.user.userName}
+					onChange={e => {
+						setApplicationUserData({
+							...applicationUserData,
+							user: {
+								...applicationUserData.user,
+								userName: e.target.value
+							}
+						});
+					}}
+				></TextField>
+				<label for="description-label">Description</label>
+				<TextField
+					id="description-label"
+					value={applicationUserData.user.description}
+					onChange={e => {
+						setApplicationUserData({
+							...applicationUserData,
+							user: {
+								...applicationUserData.user,
+								description: e.target.value
+							}
+						});
+					}}
+				></TextField>
+				<Button variant="contained" onClick={updateUserAttributes}>
+					Submit
+				</Button>
+			</Box>
+		</form>
 	);
 };
 export { ApplicationUser };

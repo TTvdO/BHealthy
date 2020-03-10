@@ -20,5 +20,7 @@ namespace HealthSocialMediaApp.Models
         public DateTime CreatedAt { get; set; }
 
         public virtual Category Category { get; set; }
+
+        public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }

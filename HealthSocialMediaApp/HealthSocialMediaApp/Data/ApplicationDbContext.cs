@@ -31,8 +31,9 @@ namespace HealthSocialMediaApp.Data
             builder.Entity<Post>().Property(p => p.Description).IsRequired().HasMaxLength(512);
             builder.Entity<Post>().Property(p => p.CreatedAt).IsRequired().HasColumnType("date");
 
-            builder.Entity<ApplicationUser>().Property(p => p.UserName).HasMaxLength(32);
             builder.Entity<ApplicationUser>().Property(p => p.Description).HasMaxLength(512);
+            builder.Entity<ApplicationUser>().HasMany<Post>(c => c.Posts).WithOne(p => p.ApplicationUser);
+
         }
 
         public DbSet<Category> Categories { get; set; }
