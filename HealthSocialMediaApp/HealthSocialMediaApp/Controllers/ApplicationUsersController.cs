@@ -27,9 +27,14 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/applicationusers/a0e61ab9-ef88-470e-b0f0-9e06b1542c4f
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApplicationUser>> GetUser(string id)
+        public async Task<ActionResult<ApplicationUser>> GetUser(string idOfProfileToGet, [FromBody] ApplicationUser userAttemptingGet)
         {
-            var user = await _context.Users.FindAsync(id);
+            if (idOfProfileToGet != userAttemptingGet.Id)
+            {
+                return BadRequest();
+            }
+
+            ApplicationUser user = await _context.Users.FindAsync(idOfProfileToGet);
 
             if (user == null)
             {
@@ -43,15 +48,24 @@ namespace HealthSocialMediaApp.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutApplicationUser(string id, [FromBody] ApplicationUser applicationUser)
+        public async Task<IActionResult> PutApplicationUser(string idOfProfileToEdit, [FromBody] ApplicationUser newUserInformation)
         {
 
-            if (id != applicationUser.Id)
+            if (idOfProfileToEdit != newUserInformation.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(applicationUser).State = EntityState.Modified;
+            ApplicationUser userToEdit = await _context.Users.FindAsync(idOfProfileToEdit);
+            string idOfUserToEdit = userToEdit.Id;
+            string emailOfUserToEdit = userToEdit.Email;
+            if (newUserInformation.Id != idOfUserToEdit || newUserInformation.Email != emailOfUserToEdit)
+            {
+                newUserInformation.Id = idOfUserToEdit;
+                newUserInformation.Email = emailOfUserToEdit;
+            }
+
+            _context.Entry(newUserInformation).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +73,7 @@ namespace HealthSocialMediaApp.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ApplicationUserExists(id))
+                if (!ApplicationUserExists(idOfProfileToEdit))
                 {
                     return NotFound();
                 }
@@ -72,7 +86,7 @@ namespace HealthSocialMediaApp.Controllers
             return NoContent();
         }
 
-        
+
         private bool ApplicationUserExists(string id)
         {
             return _context.Users.Any(a => a.Id == id);

@@ -15,6 +15,7 @@ const ApplicationUser = () => {
 			authService.getUser().then(user => {
 				console.log("user", user);
 				fetch(`/api/applicationusers/${user.sub}`, {
+                    body: JSON.stringify(applicationUserData.user),
 					headers: !token
 						? {}
 						: {
