@@ -34,7 +34,7 @@ namespace HealthSocialMediaApp.Controllers
                            p.CreatedAt,
                            p.ApplicationUser.UserName,
                            p.ApplicationUserId
-                       }).ToListAsync();
+                       }).OrderByDescending(d => d.CreatedAt).ToListAsync();
             return post;
         }
 

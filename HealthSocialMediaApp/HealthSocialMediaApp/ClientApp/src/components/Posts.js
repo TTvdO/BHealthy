@@ -16,6 +16,7 @@ import ShareIcon from "@material-ui/icons/Share";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Container from "@material-ui/core/Container";
+import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -96,7 +97,7 @@ const Posts = () => {
 							</IconButton>
 						}
 						title={item.userName}
-						subheader={item.createdAt}
+						subheader={moment(item.createdAt, "YYYYMMDD").fromNow()}
 					/>
 					<CardMedia
 						className={classes.media}
@@ -147,7 +148,6 @@ const Posts = () => {
 					</Collapse>*/}
 				</Card>
 			))}
-			;
 		</Container>
 	);
 };
