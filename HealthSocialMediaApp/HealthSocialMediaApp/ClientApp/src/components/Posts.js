@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import CardMedia from "@material-ui/core/CardMedia";
-import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
-import Collapse from "@material-ui/core/Collapse";
-import Avatar from "@material-ui/core/Avatar";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
 import { red } from "@material-ui/core/colors";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ShareIcon from "@material-ui/icons/Share";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import Container from "@material-ui/core/Container";
+import DeleteIcon from "@material-ui/icons/Delete";
 import moment from "moment";
+import {
+	Container,
+	Card,
+	CardHeader,
+	CardMedia,
+	CardContent,
+	CardActions,
+	IconButton,
+	Typography,
+	Avatar
+} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -46,6 +47,16 @@ const Posts = () => {
 	const classes = useStyles();
 	const [expanded, setExpanded] = React.useState(false);
 
+	const [open, setOpen] = React.useState(false);
+
+	const handleClickOpen = () => {
+		setOpen(true);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
 	const handleExpandClick = () => {
 		setExpanded(!expanded);
 	};
@@ -55,7 +66,7 @@ const Posts = () => {
 		error: undefined
 	});
 
-	useEffect(() => {
+	const getPosts = () => {
 		setData({ posts: [], isLoading: true, error: undefined });
 
 		fetch("/api/posts", {})
@@ -72,7 +83,22 @@ const Posts = () => {
 			.catch(error => {
 				console.log(error);
 			});
+	};
+
+	useEffect(() => {
+		getPosts();
 	}, [setData]);
+
+	const deletePost = id => {
+		fetch("/api/posts/" + id, { method: "DELETE" })
+			.then(response => {
+				getPosts();
+			})
+			.catch(error => {
+				console.log(error);
+			});
+	};
+
 	return (
 		<Container maxWidth="sm">
 			<h1>Explore</h1>
@@ -92,8 +118,19 @@ const Posts = () => {
 							</Avatar>
 						}
 						action={
-							<IconButton aria-label="settings">
-								<MoreVertIcon />
+							<IconButton
+								aria-label="delete"
+								onClick={() => {
+									if (
+										window.confirm(
+											"Are you sure you want to delete this post?"
+										)
+									) {
+										deletePost(item.id);
+									}
+								}}
+							>
+								<DeleteIcon />
 							</IconButton>
 						}
 						title={item.userName}
