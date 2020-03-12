@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace HealthSocialMediaApp.Controllers
 {
@@ -52,9 +54,11 @@ namespace HealthSocialMediaApp.Controllers
             return post;
         }
 
+
         // PUT: api/Posts/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPost(int id, Post post)
         {
@@ -87,6 +91,7 @@ namespace HealthSocialMediaApp.Controllers
         // POST: api/Posts
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Post>> PostPost(Post post)
         {
