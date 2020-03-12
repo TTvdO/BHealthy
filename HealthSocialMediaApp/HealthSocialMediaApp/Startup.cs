@@ -60,7 +60,8 @@ namespace HealthSocialMediaApp
                 configuration.RootPath = "ClientApp/build";
             });
 
-            if(_currentEnvironment.IsDevelopment()) {
+            if (_currentEnvironment.IsDevelopment())
+            {
                 services.AddHttpsRedirection(options =>
                 {
                     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;

@@ -1,0 +1,203 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "hostingPlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the hosting plan."
+            }
+        },
+        "websiteName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the app service."
+            }
+        },
+        "sqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the SQL Server."
+            }
+        },
+        "databaseName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the database on the SQL Server."
+            }
+        },
+        "insightsName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the insights."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The location for all resources."
+            }
+        },
+        "serverFarmResourceGroup": {
+            "type": "string"
+        },
+        "skuName": {
+            "type": "string",
+            "defaultValue": "S1",
+            "allowedValues": [
+                "F1",
+                "D1",
+                "B1",
+                "B2",
+                "B3",
+                "S1",
+                "S2",
+                "S3",
+                "P1",
+                "P2",
+                "P3",
+                "P4"
+            ],
+            "metadata": {
+                "description": "Describes plan's pricing tier and instance size."
+            }
+        },
+        "errorLink": {
+            "type": "string"
+        },
+        "sqlAdministratorLogin": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The SQL Server admin user id."
+            }
+        },
+        "sqlAdministratorLoginPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The SQL Server admin password."
+            }
+        },
+        "authenticationGoogleClientId": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The Google Authentication client id."
+            }
+        },
+        "authenticationGoogleClientSecret": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The Google Authentication client secret."
+            }
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('websiteName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "Microsoft.Insights/components/bhealthy-insights",
+                "[concat(parameters('sqlServerName'))]",
+                "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('websiteName')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "ANCM_ADDITIONAL_ERROR_PAGE_LINK",
+                            "value": "[parameters('errorLink')]"
+                        },
+                        {
+                            "name": "Authentication:Google:ClientId",
+                            "value": "[parameters('authenticationGoogleClientId')]"
+                        },
+                        {
+                            "name": "Authentication:Google:ClientSecret",
+                            "value": "[parameters('authenticationGoogleClientSecret')]"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "DefaultConnection",
+                            "connectionString": "[concat('Server=',parameters('sqlServerName'),'.database.windows.net;Database=', parameters('databaseName'),';User Id=',parameters('sqlAdministratorLogin'), '; Password=', parameters('sqlAdministratorLoginPassword'), ';')]"
+                        }
+                    ]
+                },
+                "serverFarmId": "[concat('/subscriptions/', parameters('subscriptionId'),'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('hostingPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[parameters('location')]",
+            "kind": "",
+            "dependsOn": [
+            ],
+            "properties": {
+                "name": "[parameters('hostingPlanName')]",
+                "workerSize": "0",
+                "workerSizeId": "0",
+                "numberOfWorkers": "1"
+            },
+            "sku": {
+                "name": "[parameters('skuName')]"
+            }
+        },
+        {
+            "name": "[concat(parameters('sqlServerName'))]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2015-05-01-preview",
+                    "dependsOn": [
+                        "[concat(parameters('sqlServerName'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "name": "AllowAllWindowsAzureIps",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    "name": "[concat(parameters('sqlServerName'), '/', parameters('databaseName'))]",
+                    "type": "Microsoft.Sql/servers/databases",
+                    "apiVersion": "2014-04-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[concat(parameters('sqlServerName'))]"
+                    ],
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS",
+                        "edition": "Basic",
+                        "maxSizeBytes": "1073741824",
+                        "requestedServiceObjectiveName": "Basic"
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2015-05-01",
+            "name": "[parameters('insightsName')]",
+            "type": "Microsoft.Insights/components",
+            "kind": "web",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "Application_Type": "web"
+            }
+        }
+    ]
+}

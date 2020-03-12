@@ -1,8 +1,12 @@
-# Introduction
+# BHealthy Social Medium
+
+[![Build status](https://dev.azure.com/hhs-se-s6/Group%204/_apis/build/status/BHealthy.CI)](https://dev.azure.com/hhs-se-s6/Group%204/_build/latest?definitionId=6)
+
+## Introduction
 
 BHealthy aims to improve the lives of health enthusiasts.
 
-# Getting Started
+## Getting Started
 
 ## Installation process
 
@@ -68,6 +72,6 @@ Run while watching for file changes.
 dotnet watch run
 ```
 
-# Build and Test
+## Build and Test
 
 TODO: Describe and show how to build your code and run the tests.
