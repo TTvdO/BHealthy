@@ -64,7 +64,7 @@ namespace HealthSocialMediaApp
                 services.AddHttpsRedirection(options =>
                 {
                     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                    options.HttpsPort = 5001;
+                    //options.HttpsPort = 5001;
                 });
             }
         }
