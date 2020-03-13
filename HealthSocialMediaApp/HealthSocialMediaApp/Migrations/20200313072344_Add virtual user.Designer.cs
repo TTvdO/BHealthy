@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthSocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200310121003_virtual-user")]
-    partial class virtualuser
+    [Migration("20200313072344_Add virtual user")]
+    partial class Addvirtualuser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,9 +28,6 @@ namespace HealthSocialMediaApp.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("Birthday")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -77,8 +74,8 @@ namespace HealthSocialMediaApp.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
@@ -365,7 +362,7 @@ namespace HealthSocialMediaApp.Migrations
             modelBuilder.Entity("HealthSocialMediaApp.Models.Post", b =>
                 {
                     b.HasOne("HealthSocialMediaApp.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("HealthSocialMediaApp.Models.Category", "Category")
