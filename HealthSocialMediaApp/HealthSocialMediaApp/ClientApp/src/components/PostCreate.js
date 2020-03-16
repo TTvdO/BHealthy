@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import Container from "@material-ui/core/Container";
 import authService from "./api-authorization/AuthorizeService";
 import moment from "moment";
 
@@ -15,29 +14,27 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const PostCreate = () => {
+const initialPost = {
+	imageLink: "",
+	description: "",
+	categoryId: 1,
+	applicationUserId: "",
+	createdAt: ""
+};
+
+const PostCreate = ({ onCreate }) => {
 	const classes = useStyles();
-	const [postData, setPostData] = useState({
-		post: {
-			imageLink: "",
-			description: "",
-			categoryId: 1,
-			applicationUserId: "",
-			createdAt: ""
-		},
-		isLoading: false,
-		error: null
-	});
+	const [post, setPost] = useState(initialPost);
 
 	const updatePostAttributes = () => {
 		authService.getAccessToken().then(token => {
 			// Send authorization token so the backend can verify the user.
 			authService.getUser().then(user => {
-				postData.post.applicationUserId = user.sub;
-				postData.post.createdAt = moment();
+				post.applicationUserId = user.sub;
+				post.createdAt = moment();
 				fetch(`/api/posts/`, {
 					method: "POST",
-					body: JSON.stringify(postData.post),
+					body: JSON.stringify(post),
 					headers: !token
 						? {}
 						: {
@@ -45,14 +42,15 @@ const PostCreate = () => {
 								"Content-Type": "application/json;charset=utf-8"
 						  }
 				}).then(response => {
-					window.location.href = "Posts";
+					onCreate();
+					setPost(initialPost);
 				});
 			});
 		});
 	};
 
 	return (
-		<Container maxWidth="sm">
+		<>
 			<h1>Create a post</h1>
 			<form className={classes.root} noValidate autoComplete="off">
 				<TextField
@@ -60,14 +58,11 @@ const PostCreate = () => {
 					id="imagelink"
 					label="Image Link"
 					name="imagelink"
-					value={postData.post.imageLink}
+					value={post.imageLink}
 					onChange={e => {
-						setPostData({
-							...postData,
-							post: {
-								...postData.post,
-								imageLink: e.target.value
-							}
+						setPost({
+							...post,
+							imageLink: e.target.value
 						});
 					}}
 				/>
@@ -75,15 +70,12 @@ const PostCreate = () => {
 					id="description"
 					label="Description"
 					name="description"
-					value={postData.post.Description}
+					value={post.description}
 					multiline
 					onChange={e => {
-						setPostData({
-							...setPostData,
-							post: {
-								...postData.post,
-								Description: e.target.value
-							}
+						setPost({
+							...post,
+							description: e.target.value
 						});
 					}}
 				/>
@@ -97,8 +89,7 @@ const PostCreate = () => {
 					</Button>
 				</div>
 			</form>
-			<p>{postData.status}</p>
-		</Container>
+		</>
 	);
 };
 

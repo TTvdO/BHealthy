@@ -12,13 +12,13 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthSocialMediaApp.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class PostsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        
+
         public PostsController(ApplicationDbContext context)
         {
             _context = context;
@@ -29,14 +29,16 @@ namespace HealthSocialMediaApp.Controllers
         public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts()
         {
             var post = await (from p in _context.Posts
-                       select new {
-                           p.Id, p.ImageLink,
-                           p.Description,
-                           p.CategoryId,
-                           p.CreatedAt,
-                           p.ApplicationUser.UserName,
-                           p.ApplicationUserId
-                       }).OrderByDescending(d => d.CreatedAt).ToListAsync();
+                              select new
+                              {
+                                  p.Id,
+                                  p.ImageLink,
+                                  p.Description,
+                                  p.CategoryId,
+                                  p.CreatedAt,
+                                  p.ApplicationUser.UserName,
+                                  p.ApplicationUserId
+                              }).OrderByDescending(d => d.CreatedAt).ToListAsync();
             return post;
         }
 

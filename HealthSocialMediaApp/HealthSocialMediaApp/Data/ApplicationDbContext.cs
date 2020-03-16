@@ -34,6 +34,14 @@ namespace HealthSocialMediaApp.Data
             builder.Entity<ApplicationUser>().Property(p => p.Description).HasMaxLength(512);
             builder.Entity<ApplicationUser>().HasMany<Post>(c => c.Posts).WithOne(p => p.ApplicationUser);
 
+
+            // Seeding
+            var foodCategory = new Category
+            {
+                Id = 1,
+                Name = "Food"
+            };
+            builder.Entity<Category>().HasData(foodCategory);
         }
 
         public DbSet<Category> Categories { get; set; }

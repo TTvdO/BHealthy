@@ -1,53 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
-import authService from "./api-authorization/AuthorizeService";
+import { Container, Typography } from "@material-ui/core";
 
-import { Typography } from "@material-ui/core";
+import { PostCreate } from "./PostCreate";
+import { Posts } from "./Posts";
+
+import { useRestApi } from "./useRestApi";
 
 const Home = () => {
-	const [data, setData] = useState({
-		users: [],
-		isLoading: false,
-		error: undefined
-	});
+	const [{ data: posts, isLoading, error }, fetchData] = useRestApi(
+		"/api/posts",
+		[]
+	);
 
 	useEffect(() => {
-		setData({ users: [], isLoading: true, error: undefined });
-		authService.getAccessToken().then(token => {
-			// Send authorization token so the backend can verify the user.
-			fetch("/api/applicationusers", {
-				headers: !token ? {} : { Authorization: `Bearer ${token}` }
+		fetchData();
+	}, [fetchData]);
+
+	const handleDeletePost = id => {
+		fetch("/api/posts/" + id, { method: "DELETE" })
+			.then(() => {
+				fetchData();
 			})
-				.then(response => {
-					return response.json();
-				})
-				.then(user => {
-					setData({
-						users: user,
-						isLoading: false,
-						error: undefined
-					});
-				})
-				.catch(error => {
-					setData({
-						users: {},
-						isLoading: false,
-						error
-					});
-				});
-		});
-	}, [setData]);
+			.catch(error => {
+				console.error(error);
+			});
+	};
+
+	const handleCreatePost = () => {
+		fetchData();
+	};
 
 	return (
-		<>
-			{data.isLoading && <Typography>Loading user count...</Typography>}
-			{!data.isLoading && data.error && (
-				<Typography>Could not fetch user count</Typography>
+		<Container maxWidth="sm">
+			<PostCreate onCreate={handleCreatePost}></PostCreate>
+			<h1>Explore</h1>
+			{isLoading && <Typography>Loading posts...</Typography>}
+			{!isLoading && error && (
+				<Typography>Could not fetch posts...</Typography>
 			)}
-			{!data.isLoading && !data.error && (
-				<Typography>Total users: {data.users.length}</Typography>
+			{posts.length > 0 && (
+				<Posts posts={posts} onDelete={handleDeletePost}></Posts>
 			)}
-		</>
+			{posts.length === 0 && !isLoading && !error && (
+				<Typography>There are no posts created yet...</Typography>
+			)}
+		</Container>
 	);
 };
 
