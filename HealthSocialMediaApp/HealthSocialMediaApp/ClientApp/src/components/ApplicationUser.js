@@ -13,9 +13,7 @@ const ApplicationUser = () => {
 		setApplicationUserData({ user: {}, isLoading: true, error: undefined });
 		authService.getAccessToken().then(token => {
 			authService.getUser().then(user => {
-				console.log("user", user);
 				fetch(`/api/applicationusers/${user.sub}`, {
-                    body: JSON.stringify(applicationUserData.user),
 					headers: !token
 						? {}
 						: {
