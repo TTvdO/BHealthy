@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthSocialMediaUnitTest", "HealthSocialMediaUnitTest.csproj", "{F698B9B5-85DB-4C6C-AE30-40AB5155F753}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthSocialMediaApp", "..\HealthSocialMediaApp\HealthSocialMediaApp.csproj", "{2D497A96-97DD-49C4-B6CC-F2439A708161}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F698B9B5-85DB-4C6C-AE30-40AB5155F753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F698B9B5-85DB-4C6C-AE30-40AB5155F753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F698B9B5-85DB-4C6C-AE30-40AB5155F753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F698B9B5-85DB-4C6C-AE30-40AB5155F753}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D497A96-97DD-49C4-B6CC-F2439A708161}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D497A96-97DD-49C4-B6CC-F2439A708161}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D497A96-97DD-49C4-B6CC-F2439A708161}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D497A96-97DD-49C4-B6CC-F2439A708161}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
