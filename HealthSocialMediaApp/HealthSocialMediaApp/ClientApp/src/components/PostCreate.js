@@ -33,8 +33,8 @@ const PostCreate = ({ onCreate }) => {
 				post.applicationUserId = user.sub;
 				post.createdAt = moment();
 				fetch(`/api/posts/`, {
-					method: "POST",
-					body: JSON.stringify(post),
+                    method: "POST",
+                    body: JSON.stringify(post),
 					headers: !token
 						? {}
 						: {

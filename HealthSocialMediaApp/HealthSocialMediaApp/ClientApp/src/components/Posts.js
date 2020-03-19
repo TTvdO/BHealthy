@@ -1,9 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { red } from "@material-ui/core/colors";
-import FavoriteIcon from "@material-ui/icons/Favorite";
 import DeleteIcon from "@material-ui/icons/Delete";
 import moment from "moment";
+
 import {
 	Card,
 	CardHeader,
@@ -14,6 +14,8 @@ import {
 	Typography,
 	Avatar
 } from "@material-ui/core";
+
+import { Like } from "./Like";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -39,15 +41,15 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const Posts = ({ posts, onDelete }) => {
+const Posts = ({ posts, onDelete, onLike }) => {
 	const classes = useStyles();
 
-	return posts.map(item => (
-		<Card className={classes.root} key={item.id}>
+	return posts.map(post => (
+		<Card className={classes.root} key={post.id}>
 			<CardHeader
 				avatar={
 					<Avatar aria-label="recipe" className={classes.avatar}>
-						{item.userName[0] + item.userName[1]}
+						{post.userName[0] + post.userName[1]}
 					</Avatar>
 				}
 				action={
@@ -59,30 +61,32 @@ const Posts = ({ posts, onDelete }) => {
 									"Are you sure you want to delete this post?"
 								)
 							) {
-								onDelete(item.id);
+								onDelete(post.id);
 							}
 						}}
 					>
 						<DeleteIcon />
 					</IconButton>
 				}
-				title={item.userName}
-				subheader={moment(item.createdAt, "YYYYMMDD").fromNow()}
+				title={post.userName}
+				subheader={moment(post.createdAt, "YYYYMMDD").fromNow()}
 			/>
 			<CardMedia
 				className={classes.media}
-				image={item.imageLink}
-				title={item.description}
+				image={post.imageLink}
+				title={post.description}
 			/>
 			<CardContent>
 				<Typography variant="body2" color="textSecondary" component="p">
-					{item.description}
+					{post.description}
 				</Typography>
 			</CardContent>
 			<CardActions disableSpacing>
-				<IconButton aria-label="add to favorites">
-					<FavoriteIcon />
-				</IconButton>
+				<Like
+					isLiked={post.isLikedByCurrentUser}
+					onToggle={() => onLike(post)}
+				/>
+				<Typography>{post.amountOfLikes}</Typography>
 			</CardActions>
 		</Card>
 	));

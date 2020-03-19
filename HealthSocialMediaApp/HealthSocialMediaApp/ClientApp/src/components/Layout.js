@@ -26,7 +26,11 @@ const Layout = ({ children }) => {
 					</Button>
 
 					<LoginMenu></LoginMenu>
-					<Button component={RouterLink} to="/PrivacyPolicy" color="inherit">
+					<Button
+						component={RouterLink}
+						to="/PrivacyPolicy"
+						color="inherit"
+					>
 						PrivacyPolicy
 					</Button>
 				</Toolbar>

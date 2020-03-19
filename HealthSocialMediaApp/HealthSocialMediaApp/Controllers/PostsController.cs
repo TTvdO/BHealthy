@@ -26,9 +26,11 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts()
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId)
         {
             var post = await (from p in _context.Posts
+                              let likeCount = (from like in _context.Likes where like.PostId == p.Id select like.Id).Count()
+                              let likedByUser = currentUserId != null ? (from like in _context.Likes where like.PostId == p.Id && like.ApplicationUserId == currentUserId select like.Id).Any() : false
                               select new
                               {
                                   p.Id,
@@ -37,7 +39,9 @@ namespace HealthSocialMediaApp.Controllers
                                   p.CategoryId,
                                   p.CreatedAt,
                                   p.ApplicationUser.UserName,
-                                  p.ApplicationUserId
+                                  p.ApplicationUserId,
+                                  amountOfLikes = likeCount,
+                                  isLikedByCurrentUser = likedByUser
                               }).OrderByDescending(d => d.CreatedAt).ToListAsync();
             return post;
         }
@@ -56,38 +60,76 @@ namespace HealthSocialMediaApp.Controllers
             return post;
         }
 
-
-        // PUT: api/Posts/5
+        // PUT: api/Posts/5/like
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [Authorize]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, Post post)
+        [HttpPut("{id}/like")]
+        public async Task<ActionResult<Post>> PutPostLike(int id, string userId)
         {
-            if (id != post.Id)
+            var post = await _context.Posts.FindAsync(id);
+
+            if (post == null)
             {
                 return BadRequest();
             }
 
-            _context.Entry(post).State = EntityState.Modified;
-
-            try
+            bool userAlreadyLikedPost = false;
+            foreach (Like like in _context.Likes)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PostExists(id))
+                if (like.ApplicationUserId.Equals(userId) && like.PostId.Equals(id))
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    userAlreadyLikedPost = true;
                 }
             }
 
-            return NoContent();
+            if (userAlreadyLikedPost)
+            {
+                return BadRequest();
+            }
+
+            Like correspondingLike = new Like();
+            correspondingLike.PostId = id;
+            correspondingLike.ApplicationUserId = userId;
+
+            _context.Likes.Add(correspondingLike);
+            await _context.SaveChangesAsync();
+
+            return StatusCode(200);
+        }
+
+        // PUT: api/Posts/5/unlike
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [Authorize]
+        [HttpPut("{id}/unlike")]
+        public async Task<ActionResult<Post>> PutPostUnlike(int id, string userId)
+        {
+            var post = await _context.Posts.FindAsync(id);
+
+            if (post == null)
+            {
+                return BadRequest();
+            }
+
+            bool userHasNotLikedPost = true;
+            foreach (Like like in _context.Likes)
+            {
+                if (like.ApplicationUserId.Equals(userId) && like.PostId.Equals(id))
+                {
+                    _context.Likes.Remove(like);
+                    userHasNotLikedPost = false;
+                }
+            }
+
+            if (userHasNotLikedPost)
+            {
+                return BadRequest();
+            }
+
+            await _context.SaveChangesAsync();
+
+            return StatusCode(200);
         }
 
         // POST: api/Posts
@@ -95,12 +137,13 @@ namespace HealthSocialMediaApp.Controllers
         // more details see https://aka.ms/RazorPagesCRUD.
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(Post post)
+        public async Task<ActionResult<Post>> PostPost([FromBody] Post post)
         {
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPost", new { id = post.Id }, post);
+            // return CreatedAtAction("GetPost", new { id = post.Id }, post);
+            return StatusCode(201);
         }
 
         // DELETE: api/Posts/5

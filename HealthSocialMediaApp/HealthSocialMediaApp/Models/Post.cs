@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HealthSocialMediaApp.Models
 {
@@ -19,5 +20,7 @@ namespace HealthSocialMediaApp.Models
         public virtual Category Category { get; set; }
 
         public virtual ApplicationUser ApplicationUser { get; set; }
+
+        public virtual ICollection<Like> Likes { get; set; }
     }
 }
