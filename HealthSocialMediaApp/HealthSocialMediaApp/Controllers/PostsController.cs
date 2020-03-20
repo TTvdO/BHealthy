@@ -26,11 +26,12 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId)
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId, string userName)
         {
             var post = await (from p in _context.Posts
                               let likeCount = (from like in _context.Likes where like.PostId == p.Id select like.Id).Count()
                               let likedByUser = currentUserId != null ? (from like in _context.Likes where like.PostId == p.Id && like.ApplicationUserId == currentUserId select like.Id).Any() : false
+                              where (userName != null ? p.ApplicationUser.UserName == userName : true)
                               select new
                               {
                                   p.Id,

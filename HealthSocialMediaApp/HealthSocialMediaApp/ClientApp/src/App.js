@@ -7,6 +7,7 @@ import ApiAuthorizationRoutes from "./components/api-authorization/ApiAuthorizat
 import { ApplicationPaths } from "./components/api-authorization/ApiAuthorizationConstants";
 
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
+import UserProfile from "./components/UserProfile";
 
 export default class App extends Component {
 	static displayName = App.name;
@@ -16,6 +17,7 @@ export default class App extends Component {
 			<Layout>
 				<Route exact path="/" component={Home} />
 				<Route path="/account" component={ApplicationUser} />
+				<Route path="/user/:userName" component={UserProfile} />
 				<Route
 					path={ApplicationPaths.ApiAuthorizationPrefix}
 					component={ApiAuthorizationRoutes}

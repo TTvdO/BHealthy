@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
+import { Button, TextField, Typography } from "@material-ui/core";
+
 import authService from "./api-authorization/AuthorizeService";
+
 import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
@@ -33,8 +34,8 @@ const PostCreate = ({ onCreate }) => {
 				post.applicationUserId = user.sub;
 				post.createdAt = moment();
 				fetch(`/api/posts/`, {
-                    method: "POST",
-                    body: JSON.stringify(post),
+					method: "POST",
+					body: JSON.stringify(post),
 					headers: !token
 						? {}
 						: {
@@ -51,7 +52,7 @@ const PostCreate = ({ onCreate }) => {
 
 	return (
 		<>
-			<h1>Create a post</h1>
+			<Typography variant="h4">Share what motivates you</Typography>
 			<form className={classes.root} noValidate autoComplete="off">
 				<TextField
 					required
@@ -85,7 +86,7 @@ const PostCreate = ({ onCreate }) => {
 						color="primary"
 						onClick={updatePostAttributes}
 					>
-						Save
+						Create post
 					</Button>
 				</div>
 			</form>
