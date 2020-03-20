@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, TextField, Typography } from "@material-ui/core";
-
 import authService from "./api-authorization/AuthorizeService";
-
-import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -32,7 +29,7 @@ const PostCreate = ({ onCreate }) => {
 			// Send authorization token so the backend can verify the user.
 			authService.getUser().then(user => {
 				post.applicationUserId = user.sub;
-				post.createdAt = moment();
+				post.createdAt = new Date();
 				fetch(`/api/posts/`, {
 					method: "POST",
 					body: JSON.stringify(post),

@@ -4,7 +4,6 @@ import { Link as RouterLink } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { red } from "@material-ui/core/colors";
 import DeleteIcon from "@material-ui/icons/Delete";
-import moment from "moment";
 
 import {
 	Card,
@@ -97,7 +96,7 @@ const Posts = ({ posts, isLoading, error, onDelete, onLikeToggle }) => {
 								{post.userName}
 							</Link>
 						}
-						subheader={moment(post.createdAt, "YYYYMMDD").fromNow()}
+						subheader={post.createdAt}
 					/>
 					<CardMedia
 						className={classes.media}
