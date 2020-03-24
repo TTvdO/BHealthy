@@ -154,7 +154,7 @@ const Layout = ({ children }) => {
 			<MenuItem
 				onClick={handleMenuClose}
 				component={RouterLink}
-				to={`./user/${userName}`}
+				to={`/user/${userName}`}
 				color="inherit"
 			>
 				Profile
