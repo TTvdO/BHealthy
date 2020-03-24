@@ -50,7 +50,7 @@ const UserProfile = () => {
 
 	const [
 		{ posts, isLoading, error },
-		{ handleDelete, handleLike }
+		{ handleDelete, handleLikeToggle }
 	] = usePostData(currentUserId, userName);
 
 	return (
@@ -84,7 +84,7 @@ const UserProfile = () => {
 							isLoading={isLoading}
 							error={error}
 							onDelete={handleDelete}
-							onLike={handleLike}
+							onLikeToggle={handleLikeToggle}
 						></Posts>
 					</Grid>
 				</Grid>

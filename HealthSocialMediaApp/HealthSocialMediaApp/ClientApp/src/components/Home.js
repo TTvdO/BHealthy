@@ -23,7 +23,7 @@ const Home = () => {
 
 	const [
 		{ posts, isLoading, error },
-		{ fetchPosts, handleDelete, handleLike }
+		{ fetchPosts, handleDelete, handleLikeToggle }
 	] = usePostData(currentUserId);
 
 	return (
@@ -38,7 +38,7 @@ const Home = () => {
 				isLoading={isLoading}
 				error={error}
 				onDelete={handleDelete}
-				onLike={handleLike}
+				onLikeToggle={handleLikeToggle}
 			></Posts>{" "}
 		</Container>
 	);
