@@ -47,7 +47,27 @@ namespace HealthSocialMediaApp.Data
                 Id = 1,
                 Name = "Food"
             };
+
+            var dummyUser = new ApplicationUser
+            {
+                UserName = "Beau Healthy",
+                Description = "I love sharing healthy tips for beginning health enthusiasts!",
+                Email = "beauhealthy@example.com",
+            };
+
+            var examplePost = new Post
+            {
+                Id = -1,
+                ApplicationUserId = dummyUser.Id,
+                CategoryId = foodCategory.Id,
+                Description = "Hi guys. I just saw a cool health trick. What do you think?",
+                ImageLink = "https://img1.thelist.com/img/gallery/weird-but-good-stuff-you-should-be-putting-in-your-smoothie/intro-1498667247.jpg",
+                CreatedAt = DateTime.Now
+            };
+
             builder.Entity<Category>().HasData(foodCategory);
+            builder.Entity<ApplicationUser>().HasData(dummyUser);
+            builder.Entity<Post>().HasData(examplePost);
         }
 
         public DbSet<Category> Categories { get; set; }

@@ -143,7 +143,6 @@ namespace HealthSocialMediaApp.Controllers
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
-            // return CreatedAtAction("GetPost", new { id = post.Id }, post);
             return StatusCode(201);
         }
 
