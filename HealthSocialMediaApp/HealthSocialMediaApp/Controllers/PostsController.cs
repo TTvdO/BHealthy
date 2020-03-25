@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 
 
 namespace HealthSocialMediaApp.Controllers
@@ -18,10 +16,12 @@ namespace HealthSocialMediaApp.Controllers
     public class PostsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostingEnv;
 
-        public PostsController(ApplicationDbContext context)
+        public PostsController(ApplicationDbContext context, IWebHostEnvironment hostingEnv)
         {
             _context = context;
+            _hostingEnv = hostingEnv;
         }
 
         // GET: api/Posts
@@ -133,6 +133,7 @@ namespace HealthSocialMediaApp.Controllers
             return StatusCode(200);
         }
 
+
         // POST: api/Posts
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
@@ -155,6 +156,9 @@ namespace HealthSocialMediaApp.Controllers
             {
                 return NotFound();
             }
+
+            // Delete image from dir
+            ImagesController.DeleteImage(post.ImageLink, _hostingEnv);
 
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();

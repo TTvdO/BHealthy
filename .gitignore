@@ -334,3 +334,6 @@ ASALocalRun/
 
 # (secret) local settings
 localsettings.json
+
+# Images directory
+HealthSocialMediaApp/HealthSocialMediaApp/wwwroot/images/

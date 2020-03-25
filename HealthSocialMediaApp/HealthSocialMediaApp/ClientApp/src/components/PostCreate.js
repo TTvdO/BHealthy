@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, TextField, Typography } from "@material-ui/core";
 import authService from "./api-authorization/AuthorizeService";
+import InputLabel from "@material-ui/core/InputLabel";
+import { Button, TextField, Typography } from "@material-ui/core";
+
+function postCreateAlert(message) {
+	alert(message);
+}
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -23,6 +28,7 @@ const initialPost = {
 const PostCreate = ({ onCreate }) => {
 	const classes = useStyles();
 	const [post, setPost] = useState(initialPost);
+	const [input, setInput] = useState(null);
 
 	const updatePostAttributes = () => {
 		authService.getAccessToken().then(token => {
@@ -30,19 +36,50 @@ const PostCreate = ({ onCreate }) => {
 			authService.getUser().then(user => {
 				post.applicationUserId = user.sub;
 				post.createdAt = new Date();
-				fetch(`/api/posts/`, {
+
+				if (typeof input === "undefined" || input === null) {
+					postCreateAlert("Please select a image to upload.");
+					return Promise.reject("No file selected");
+				}
+
+				var formdata = new FormData();
+				formdata.append("file", input.file, input.file.name);
+
+				fetch(`/api/images`, {
 					method: "POST",
-					body: JSON.stringify(post),
+					body: formdata,
 					headers: !token
 						? {}
 						: {
-								Authorization: `Bearer ${token}`,
-								"Content-Type": "application/json;charset=utf-8"
+								Authorization: `Bearer ${token}`
 						  }
-				}).then(response => {
-					onCreate();
-					setPost(initialPost);
-				});
+				})
+					.then(response => {
+						console.log(response);
+						return response.json();
+					})
+					.then(data => {
+						if (data.startsWith("Error:")) {
+							postCreateAlert(data);
+							return Promise.reject(data);
+						}
+						post.imageLink = data;
+						fetch(`/api/posts/`, {
+							method: "POST",
+							body: JSON.stringify(post),
+							headers: !token
+								? {}
+								: {
+										Authorization: `Bearer ${token}`,
+										"Content-Type":
+											"application/json;charset=utf-8"
+								  }
+						}).then(response => {
+							document.getElementById("file").value = "";
+							onCreate();
+							setPost(initialPost);
+						});
+					});
 			});
 		});
 	};
@@ -51,17 +88,17 @@ const PostCreate = ({ onCreate }) => {
 		<>
 			<Typography variant="h4">Share what motivates you</Typography>
 			<form className={classes.root} noValidate autoComplete="off">
-				<TextField
-					required
-					id="imagelink"
-					label="Image Link"
-					name="imagelink"
-					value={post.imageLink}
+				<InputLabel htmlFor="file">Select an image</InputLabel>
+				<input
+					id="file"
+					label="Image"
+					type="file"
+					name="file"
 					onChange={e => {
-						setPost({
-							...post,
-							imageLink: e.target.value
+						setInput({
+							file: e.target.files[0]
 						});
+						document.getElementById("description").focus();
 					}}
 				/>
 				<TextField
