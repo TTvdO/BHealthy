@@ -2,10 +2,11 @@ import authService from "./api-authorization/AuthorizeService";
 import { useRestApi } from "./useRestApi";
 
 function usePostData(currentUserId, userName) {
-	const [{ data: posts, isLoading, error }, fetchPosts] = useRestApi(
-		`/api/posts?currentUserId=${currentUserId}&userId=${userName}`,
-		[]
-	);
+	let url = `/api/posts?currentUserId=${currentUserId}`;
+	if (userName) {
+		url = `/api/posts?currentUserId=${currentUserId}&userName=${userName}`;
+	}
+	const [{ data: posts, isLoading, error }, fetchPosts] = useRestApi(url, []);
 
 	const handleDelete = id => {
 		fetch(`/api/posts/${id}`, { method: "DELETE" })
