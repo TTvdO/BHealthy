@@ -5,8 +5,6 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 
 import MenuIcon from "@material-ui/icons/Menu";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import MoreIcon from "@material-ui/icons/MoreVert";
 
 import {
 	AppBar,
@@ -28,29 +26,33 @@ import { LoginMenu } from "./api-authorization/LoginMenu";
 import authService from "./api-authorization/AuthorizeService";
 
 const useStyles = makeStyles(theme => ({
+	outerContainer: {
+		position: "relative",
+		height: "100vh"
+	},
+	putBottom: {
+		position: "absolute",
+		bottom: "20px",
+		width: "100%"
+	},
 	grow: {
 		flexGrow: 1
 	},
 	menuButton: {
 		marginRight: theme.spacing(2)
 	},
-	sectionDesktop: {
-		display: "none",
-		[theme.breakpoints.up("md")]: {
-			display: "flex"
-		}
-	},
-	sectionMobile: {
-		display: "flex",
-		[theme.breakpoints.up("md")]: {
-			display: "none"
-		}
-	},
 	list: {
-		width: 250
+		width: 250,
+		overflow: "hidden"
 	},
 	fullList: {
 		width: "auto"
+	},
+	pushBottom: {
+		margin: "0 auto"
+	},
+	siteTitle: {
+		textDecorationLine: "none"
 	}
 }));
 
@@ -69,10 +71,8 @@ const Layout = ({ children }) => {
 
 	//Menu
 	const [anchorEl, setAnchorEl] = React.useState(null);
-	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
 	const isMenuOpen = Boolean(anchorEl);
-	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
 	// Menu Drawer
 	const [state, setState] = React.useState({
@@ -99,45 +99,62 @@ const Layout = ({ children }) => {
 			role="presentation"
 			onClick={toggleDrawer(anchor, false)}
 			onKeyDown={toggleDrawer(anchor, false)}
+			flexDirection="column"
 		>
 			<List>
-				<ListItemText>
-					<Typography variant="h6" align="center">
-						BHealthy
-					</Typography>
-				</ListItemText>
-				<Divider />
-				<ListItem button component={RouterLink} to="/" color="inherit">
-					<ListItemText>Home</ListItemText>
-				</ListItem>
-				<Divider />
-				<ListItem
-					button
-					component={RouterLink}
-					to="/privacy-policy"
-					color="inherit"
-				>
-					<ListItemText>Privacy policy</ListItemText>
-				</ListItem>
+				<div className={classes.outerContainer}>
+					<ListItemText>
+						<Typography variant="h6" align="center">
+							BHealthy
+						</Typography>
+					</ListItemText>
+					<Divider />
+					<ListItem
+						button
+						component={RouterLink}
+						to="/"
+						color="inherit"
+					>
+						<ListItemText>Home</ListItemText>
+					</ListItem>
+					<Divider />
+					<ListItem
+						button
+						component={RouterLink}
+						to={`/user/${userName}`}
+						color="inherit"
+					>
+						<ListItemText>My Profile</ListItemText>
+					</ListItem>
+					<Divider />
+					<div className={classes.grow}>
+						<div className={classes.putBottom}>
+							<ListItem
+								button
+								component={RouterLink}
+								to={`./account`}
+								color="inherit"
+							>
+								<ListItemText>My Account</ListItemText>
+							</ListItem>
+							<Divider />
+							<ListItem
+								button
+								component={RouterLink}
+								to="/privacy-policy"
+								color="inherit"
+							>
+								<ListItemText>Privacy policy</ListItemText>
+							</ListItem>
+						</div>
+					</div>
+				</div>
 			</List>
 		</div>
 	);
 
-	const handleProfileMenuOpen = event => {
-		setAnchorEl(event.currentTarget);
-	};
-
-	const handleMobileMenuClose = () => {
-		setMobileMoreAnchorEl(null);
-	};
-
 	const handleMenuClose = () => {
 		setAnchorEl(null);
-		handleMobileMenuClose();
-	};
-
-	const handleMobileMenuOpen = event => {
-		setMobileMoreAnchorEl(event.currentTarget);
 	};
 
 	const menuId = "primary-search-account-menu";
@@ -172,31 +189,6 @@ const Layout = ({ children }) => {
 		</Menu>
 	);
 
-	const mobileMenuId = "primary-search-account-menu-mobile";
-	const renderMobileMenu = (
-		<Menu
-			anchorEl={mobileMoreAnchorEl}
-			anchorOrigin={{ vertical: "top", horizontal: "right" }}
-			id={mobileMenuId}
-			keepMounted
-			transformOrigin={{ vertical: "top", horizontal: "right" }}
-			open={isMobileMenuOpen}
-			onClose={handleMobileMenuClose}
-		>
-			<MenuItem onClick={handleProfileMenuOpen}>
-				<IconButton
-					aria-label="account of current user"
-					aria-controls="primary-search-account-menu"
-					aria-haspopup="false"
-					color="inherit"
-				>
-					<AccountCircle />
-				</IconButton>
-				<p>Profile</p>
-			</MenuItem>
-		</Menu>
-	);
-
 	return (
 		<>
 			<CssBaseline />
@@ -225,39 +217,21 @@ const Layout = ({ children }) => {
 							</React.Fragment>
 						))}
 						<Typography
-							className={classes.title}
+							className={classes.siteTitle}
+							color="inherit"
 							variant="h6"
 							noWrap
+							component={RouterLink}
+							to="/"
 						>
-							BHealty
+							BHealthy
 						</Typography>
 						<div className={classes.grow} />
-						<div className={classes.sectionDesktop}>
-							<IconButton
-								edge="end"
-								aria-label="account of current user"
-								aria-controls={menuId}
-								aria-haspopup="true"
-								onClick={handleProfileMenuOpen}
-								color="inherit"
-							>
-								<AccountCircle />
-							</IconButton>
-						</div>
-						<div className={classes.sectionMobile}>
-							<IconButton
-								aria-label="show more"
-								aria-controls={mobileMenuId}
-								aria-haspopup="true"
-								onClick={handleMobileMenuOpen}
-								color="inherit"
-							>
-								<MoreIcon />
-							</IconButton>
+						<div>
+							<LoginMenu></LoginMenu>
 						</div>
 					</Toolbar>
 				</AppBar>
-				{renderMobileMenu}
 				{renderMenu}
 			</div>
 
