@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import authService from "./api-authorization/AuthorizeService";
 import InputLabel from "@material-ui/core/InputLabel";
 import { Button, TextField, Typography } from "@material-ui/core";
 
-function postCreateAlert(message) {
-	alert(message);
-}
+const getAuthorizationHeaders = token => {
+	return token
+		? {
+				Authorization: `Bearer ${token}`
+		  }
+		: {};
+};
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -17,71 +21,54 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const initialPost = {
-	imageLink: "",
-	description: "",
-	categoryId: 1,
-	applicationUserId: "",
-	createdAt: ""
-};
-
 const PostCreate = ({ onCreate }) => {
 	const classes = useStyles();
-	const [post, setPost] = useState(initialPost);
-	const [input, setInput] = useState(null);
+	const [description, setDescription] = useState("");
+	const [imageFile, setImageFile] = useState(null);
 
-	const updatePostAttributes = () => {
-		authService.getAccessToken().then(token => {
-			// Send authorization token so the backend can verify the user.
-			authService.getUser().then(user => {
-				post.applicationUserId = user.sub;
-				post.createdAt = new Date();
+	const fileInputRef = useRef(null);
+	const descriptionInputRef = useRef(null);
 
-				if (typeof input === "undefined" || input === null) {
-					postCreateAlert("Please select a image to upload.");
-					return Promise.reject("No file selected");
-				}
+	const createPost = async () => {
+		const token = await authService.getAccessToken();
+		const user = await authService.getUser();
 
-				var formdata = new FormData();
-				formdata.append("file", input.file, input.file.name);
+		const formdata = new FormData();
+		formdata.append("file", imageFile, imageFile.name);
 
-				fetch(`/api/images`, {
-					method: "POST",
-					body: formdata,
-					headers: !token
-						? {}
-						: {
-								Authorization: `Bearer ${token}`
-						  }
-				})
-					.then(response => {
-						console.log(response);
-						return response.json();
-					})
-					.then(data => {
-						if (data.startsWith("Error:")) {
-							postCreateAlert(data);
-							return Promise.reject(data);
-						}
-						post.imageLink = data;
-						fetch(`/api/posts/`, {
-							method: "POST",
-							body: JSON.stringify(post),
-							headers: !token
-								? {}
-								: {
-										Authorization: `Bearer ${token}`,
-										"Content-Type":
-											"application/json;charset=utf-8"
-								  }
-						}).then(response => {
-							document.getElementById("file").value = "";
-							onCreate();
-							setPost(initialPost);
-						});
-					});
-			});
+		const imageResponse = await fetch(`/api/images`, {
+			method: "POST",
+			body: formdata,
+			headers: getAuthorizationHeaders(token)
 		});
+
+		let imageLink = "";
+		try {
+			imageLink = await imageResponse.json();
+		} catch (error) {
+			alert("Error while uploading the image.");
+		}
+
+		const postData = {
+			applicationUserId: user.sub,
+			categoryId: 1,
+			description,
+			imageLink
+		};
+
+		await fetch(`/api/posts/`, {
+			method: "POST",
+			body: JSON.stringify(postData),
+			headers: {
+				...getAuthorizationHeaders(token),
+				"Content-Type": "application/json;charset=utf-8"
+			}
+		});
+
+		onCreate();
+		setImageFile(null);
+		fileInputRef.current.value = null;
+		setDescription("");
 	};
 
 	return (
@@ -90,35 +77,34 @@ const PostCreate = ({ onCreate }) => {
 			<form className={classes.root} noValidate autoComplete="off">
 				<InputLabel htmlFor="file">Select an image</InputLabel>
 				<input
-					id="file"
+					ref={fileInputRef}
 					label="Image"
 					type="file"
 					name="file"
+					accept="image/*"
 					onChange={e => {
-						setInput({
-							file: e.target.files[0]
-						});
-						document.getElementById("description").focus();
+						setImageFile(e.target.files[0]);
 					}}
 				/>
 				<TextField
-					id="description"
+					ref={descriptionInputRef}
 					label="Description"
-					name="description"
-					value={post.description}
+					value={description}
 					multiline
 					onChange={e => {
-						setPost({
-							...post,
-							description: e.target.value
-						});
+						setDescription(e.target.value);
 					}}
 				/>
 				<div>
 					<Button
 						variant="contained"
 						color="primary"
-						onClick={updatePostAttributes}
+						onClick={createPost}
+						disabled={
+							imageFile === null ||
+							imageFile === undefined ||
+							description.length === 0
+						}
 					>
 						Create post
 					</Button>

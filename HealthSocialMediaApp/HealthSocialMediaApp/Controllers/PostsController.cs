@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -62,8 +63,6 @@ namespace HealthSocialMediaApp.Controllers
         }
 
         // PUT: api/Posts/5/like
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [Authorize]
         [HttpPut("{id}/like")]
         public async Task<ActionResult<Post>> PutPostLike(int id, string userId)
@@ -100,8 +99,6 @@ namespace HealthSocialMediaApp.Controllers
         }
 
         // PUT: api/Posts/5/unlike
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [Authorize]
         [HttpPut("{id}/unlike")]
         public async Task<ActionResult<Post>> PutPostUnlike(int id, string userId)
@@ -135,12 +132,12 @@ namespace HealthSocialMediaApp.Controllers
 
 
         // POST: api/Posts
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<Post>> PostPost([FromBody] Post post)
         {
+            post.CreatedAt = DateTime.Now;
+
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
@@ -168,7 +165,7 @@ namespace HealthSocialMediaApp.Controllers
 
         private bool PostExists(int id)
         {
-            return _context.Posts.Any(e => e.Id == id);
+            return _context.Posts.Any(p => p.Id == id);
         }
     }
 }

@@ -1,6 +1,14 @@
 import authService from "./api-authorization/AuthorizeService";
 import { useRestApi } from "./useRestApi";
 
+const getAuthorizationHeaders = token => {
+	return token
+		? {
+				Authorization: `Bearer ${token}`
+		  }
+		: {};
+};
+
 function usePostData(currentUserId, userName) {
 	let url = `/api/posts?currentUserId=${currentUserId}`;
 	if (userName) {
@@ -8,41 +16,38 @@ function usePostData(currentUserId, userName) {
 	}
 	const [{ data: posts, isLoading, error }, fetchPosts] = useRestApi(url, []);
 
-	const handleDelete = id => {
-		fetch(`/api/posts/${id}`, { method: "DELETE" })
-			.then(() => {
-				fetchPosts();
-			})
-			.catch(error => {
-				console.error("Could not delete posts. Error message: ", error);
+	const handleDelete = async id => {
+		const token = await authService.getAccessToken();
+		try {
+			await fetch(`/api/posts/${id}`, {
+				method: "DELETE",
+				headers: getAuthorizationHeaders(token)
 			});
+			fetchPosts();
+		} catch (error) {
+			console.error("Could not delete posts. Error message: ", error);
+		}
 	};
 
-	const handleLikeToggle = post => {
-		authService.getAccessToken().then(token => {
-			const authorizationHeaders = !token
-				? {}
-				: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json;charset=utf-8"
-				  };
+	const handleLikeToggle = async post => {
+		const token = await authService.getAccessToken();
+		const authorizationHeaders = getAuthorizationHeaders(token);
 
-			if (!post.isLikedByCurrentUser) {
-				fetch(`/api/posts/${post.id}/like?userId=${currentUserId}`, {
+		if (!post.isLikedByCurrentUser) {
+			await fetch(`/api/posts/${post.id}/like?userId=${currentUserId}`, {
+				method: "PUT",
+				headers: authorizationHeaders
+			});
+		} else {
+			await fetch(
+				`/api/posts/${post.id}/unlike?userId=${currentUserId}`,
+				{
 					method: "PUT",
 					headers: authorizationHeaders
-				}).then(() => {
-					fetchPosts();
-				});
-			} else {
-				fetch(`/api/posts/${post.id}/unlike?userId=${currentUserId}`, {
-					method: "PUT",
-					headers: authorizationHeaders
-				}).then(() => {
-					fetchPosts();
-				});
-			}
-		});
+				}
+			);
+		}
+		fetchPosts();
 	};
 
 	return [
