@@ -82,22 +82,21 @@ const Search = () => {
 				</Paper>
 			</Grid>
 			<div>
-                {!users.length > 0 &&
-                <h2>No results found</h2>}
-                {users.length > 0 &&
-                users.map((value, index) => {
-					return (
-						<div className={classes.individualUser}>
-							<Link
-								component={RouterLink}
-								to={`/user/${value.userName}`}
-								key={index}
-							>
-								{value.userName}
-							</Link>
-						</div>
-					);
-				})}
+				{!users.length > 0 && <h2>No results found</h2>}
+				{users.length > 0 &&
+					users.map((value, index) => {
+						return (
+							<div className={classes.individualUser}>
+								<Link
+									component={RouterLink}
+									to={`/user/${value.userName}`}
+									key={index}
+								>
+									{value.userName}
+								</Link>
+							</div>
+						);
+					})}
 			</div>
 		</div>
 	);

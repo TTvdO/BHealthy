@@ -126,6 +126,14 @@ const Layout = ({ children }) => {
 					>
 						<ListItemText>My Profile</ListItemText>
 					</ListItem>
+					<ListItem
+						button
+						component={RouterLink}
+						to="/search"
+						color="inherit"
+					>
+						<ListItemText>Search</ListItemText>
+					</ListItem>
 					<Divider />
 					<div className={classes.grow}>
 						<div className={classes.putBottom}>
