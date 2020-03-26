@@ -1,105 +1,85 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
-using Moq;
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using IdentityServer4.EntityFramework.Options;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using HealthSocialMediaApp.Controllers;
 
 namespace HealthSocialMediaUnitTest
 {
-	public class UserControllerTest
-	{
-		//Write unit test to verify that user data can be accessed with GET
-		[Fact]
-		public void UserExists()
-		{
-			//arrange
-			#region context preperation
+    public class UserControllerTest
+    {
+        private ApplicationDbContext _context;
 
-			var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-				.UseInMemoryDatabase(databaseName: "TestDB")
-				.Options;
 
-			var operationalStoreOptions = Options.Create(
-				new OperationalStoreOptions
-				{
-					DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
-					PersistedGrants = new TableConfiguration("PersistedGrants")
-				});
-			var context = new ApplicationDbContext(options, operationalStoreOptions);
-			#endregion
+        public UserControllerTest()
+        {
 
-			#region data preperation
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDB")
+                .Options;
 
-			string email = "Jimmy@mail.com";
-			string id = "one-two";
+            var operationalStoreOptions = Options.Create(
+                new OperationalStoreOptions
+                {
+                    DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
+                    PersistedGrants = new TableConfiguration("PersistedGrants")
+                });
+            _context = new ApplicationDbContext(options, operationalStoreOptions);
+        }
 
-			var appUser = new ApplicationUser
-			{
-				Email = "Jimmy@mail.com",
-				UserName = "Jimmy",
-				Description = "My fitness account",
-				Id = id
-			};
+        //Write unit test to verify that user data can be accessed with GET
+        [Fact]
+        public void UserExists()
+        {
+            string email = "Jimmy@mail.com";
+            string username = "Jimmy";
+            string description = "My fitness account";
+            string id = "ojsadkhfaskjdfh";
 
-			context.Users.Add(appUser);
-			context.SaveChanges();
+            var appUser = new ApplicationUser
+            {
+                Email = email,
+                UserName = username,
+                Description = description,
+                Id = id
+            };
 
-			#endregion
+            _context.Users.Add(appUser);
+            _context.SaveChanges();
 
-			//act
-			ApplicationUsersController applicationUsersController = new ApplicationUsersController(context);
-			var result = applicationUsersController.GetUser(id);
+            //act
+            ApplicationUsersController applicationUsersController = new ApplicationUsersController(_context);
+            var result = applicationUsersController.GetUser(id);
 
-			// Assert
-			Assert.Equal(email, result.Result.Value.Email);
-		}
+            // Assert
+            Assert.Equal(email, result.Result.Value.Email);
+            Assert.Equal(username, result.Result.Value.UserName);
+            Assert.Equal(description, result.Result.Value.Description);
+        }
 
-		//Write unit test to verify that user data can be stored with PUT
-		[Fact]
-		public async void UserIsStored()
-		{
-			//arrange
-			#region context preperation
+        //Write unit test to verify that user data can be stored with PUT
+        [Fact]
+        public async void UserIsStored()
+        {
+            string email = "Jimmy@mail.com";
+            string id = "one-two-three";
 
-			var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-				.UseInMemoryDatabase(databaseName: "TestDB")
-				.Options;
+            var appUser = new ApplicationUser
+            {
+                Email = "Jimmy@mail.com",
+                UserName = "Jimmy",
+                Description = "My fitness account",
+                Id = id
+            };
 
-			var operationalStoreOptions = Options.Create(
-				new OperationalStoreOptions
-				{
-					DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
-					PersistedGrants = new TableConfiguration("PersistedGrants")
-				});
-			var context = new ApplicationDbContext(options, operationalStoreOptions);
-			#endregion
+            //act
+            ApplicationUsersController applicationUsersController = new ApplicationUsersController(_context);
+            await applicationUsersController.PutApplicationUser(id, appUser);
 
-			#region data preperation
-
-			string email = "Jimmy@mail.com";
-			string id = "one-two-three";
-
-			var appUser = new ApplicationUser
-			{
-				Email = "Jimmy@mail.com",
-				UserName = "Jimmy",
-				Description = "My fitness account",
-				Id = id
-			};
-			#endregion
-
-			//act
-			ApplicationUsersController applicationUsersController = new ApplicationUsersController(context);
-			await applicationUsersController.PutApplicationUser(id, appUser);
-
-			// Assert
-			Assert.Equal(email, context.Users.Find(id).Email);
-		}
-	}
+            // Assert
+            Assert.Equal(email, _context.Users.Find(id).Email);
+        }
+    }
 }

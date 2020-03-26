@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthSocialMediaApp", "HealthSocialMediaApp\HealthSocialMediaApp.csproj", "{818CB5BF-F5E8-4735-A3D0-61177A57FA29}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthSocialMediaUnitTest", "HealthSocialMediaUnitTests\HealthSocialMediaUnitTest.csproj", "{011E8AA0-D19E-44EE-8A67-3ED3A1784E83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthSocialMediaUnitTest", "HealthSocialMediaUnitTests\HealthSocialMediaUnitTest.csproj", "{011E8AA0-D19E-44EE-8A67-3ED3A1784E83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -102,7 +102,7 @@ namespace HealthSocialMediaApp.Controllers
             return new JsonResult(imagesError + message);
         }
 
-        public static bool IsImage(IFormFile file)
+        public static bool HasValidExtention(IFormFile file)
         {
             if (file != null)
             {
@@ -115,13 +115,18 @@ namespace HealthSocialMediaApp.Controllers
                     ".PNG"
                 };
 
-                return validExtensions.Contains(Path.GetExtension(file.FileName).ToUpper())
-                    && file.ContentType.StartsWith("image");
+                return validExtensions.Contains(Path.GetExtension(file.FileName).ToUpper());
             }
+
             return false;
         }
 
-        private static string GetExtention(IFormFile file)
+        public static bool IsImage(IFormFile file)
+        {
+            return file.ContentType.StartsWith("image") && HasValidExtention(file);
+        }
+
+        public static string GetExtention(IFormFile file)
         {
             return Path.GetExtension(file.FileName);
         }
