@@ -208,7 +208,7 @@ namespace HealthSocialMediaApp.Migrations
                     ImageLink = table.Column<string>(maxLength: 256, nullable: false),
                     Description = table.Column<string>(maxLength: 512, nullable: false),
                     CategoryId = table.Column<int>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "date", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {

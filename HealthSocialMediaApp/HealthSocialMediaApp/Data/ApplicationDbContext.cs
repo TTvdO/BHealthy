@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HealthSocialMediaApp.Data
 {
@@ -29,7 +26,7 @@ namespace HealthSocialMediaApp.Data
             builder.Entity<Post>().HasKey(p => p.Id);
             builder.Entity<Post>().Property(p => p.ImageLink).IsRequired().HasMaxLength(256);
             builder.Entity<Post>().Property(p => p.Description).IsRequired().HasMaxLength(512);
-            builder.Entity<Post>().Property(p => p.CreatedAt).IsRequired().HasColumnType("date");
+            builder.Entity<Post>().Property(p => p.CreatedAt).IsRequired().HasColumnType("datetime");
             builder.Entity<Post>().HasOne<ApplicationUser>(p => p.ApplicationUser).WithMany(a => a.Posts);
             builder.Entity<Post>().HasMany<Like>(p => p.Likes).WithOne(l => l.Post);
 
@@ -60,8 +57,8 @@ namespace HealthSocialMediaApp.Data
                 Id = -1,
                 ApplicationUserId = dummyUser.Id,
                 CategoryId = foodCategory.Id,
-                Description = "Hi guys. I just saw a cool health trick. What do you think?",
-                ImageLink = "https://img1.thelist.com/img/gallery/weird-but-good-stuff-you-should-be-putting-in-your-smoothie/intro-1498667247.jpg",
+                Description = "Delicious strawberries.",
+                ImageLink = "https://31.media.tumblr.com/a367ee66aafa29b7aa291730a5afe6a6/tumblr_mmho93xEAH1ruw74xo1_250.gif",
                 CreatedAt = DateTime.Now
             };
 

@@ -96,7 +96,7 @@ const Posts = ({ posts, isLoading, error, onDelete, onLikeToggle }) => {
 								{post.userName}
 							</Link>
 						}
-						subheader={post.createdAt}
+						subheader={new Date(post.createdAt).toLocaleString()}
 					/>
 					<CardMedia
 						className={classes.media}
