@@ -13,8 +13,6 @@ import {
 	Typography,
 	Container,
 	IconButton,
-	MenuItem,
-	Menu,
 	List,
 	Divider,
 	ListItem,
@@ -70,12 +68,12 @@ const Layout = ({ children }) => {
 	const classes = useStyles();
 
 	//Menu
-	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [anchorEl, setAnchorEl] = useState(null);
 
 	const isMenuOpen = Boolean(anchorEl);
 
 	// Menu Drawer
-	const [state, setState] = React.useState({
+	const [state, setState] = useState({
 		left: false
 	});
 
@@ -140,7 +138,7 @@ const Layout = ({ children }) => {
 							<ListItem
 								button
 								component={RouterLink}
-								to={`./account`}
+								to={`/account`}
 								color="inherit"
 							>
 								<ListItemText>My Account</ListItemText>
@@ -164,38 +162,6 @@ const Layout = ({ children }) => {
 	const handleMenuClose = () => {
 		setAnchorEl(null);
 	};
-
-	const menuId = "primary-search-account-menu";
-	const renderMenu = (
-		<Menu
-			anchorEl={anchorEl}
-			anchorOrigin={{ vertical: "top", horizontal: "right" }}
-			id={menuId}
-			keepMounted
-			transformOrigin={{ vertical: "top", horizontal: "right" }}
-			open={isMenuOpen}
-			onClose={handleMenuClose}
-		>
-			<MenuItem
-				onClick={handleMenuClose}
-				component={RouterLink}
-				to={`/user/${userName}`}
-				color="inherit"
-			>
-				Profile
-			</MenuItem>
-			<MenuItem
-				onClick={handleMenuClose}
-				component={RouterLink}
-				to={`./account`}
-			>
-				My account
-			</MenuItem>
-			<MenuItem>
-				<LoginMenu></LoginMenu>
-			</MenuItem>
-		</Menu>
-	);
 
 	return (
 		<>
@@ -240,9 +206,7 @@ const Layout = ({ children }) => {
 						</div>
 					</Toolbar>
 				</AppBar>
-				{renderMenu}
 			</div>
-
 			<Container maxWidth="md">{children}</Container>
 		</>
 	);
