@@ -14,7 +14,7 @@ namespace HealthSocialMediaUnitTest
 {
     public class PostsControllerTests
     {
-        
+
         public ApplicationDbContext CreateContextTests(string name)
         {
 
@@ -50,7 +50,7 @@ namespace HealthSocialMediaUnitTest
 
         private Category CreateDummyCategory(int id, ApplicationDbContext _context)
         {
-            var category = new Category{ Id = id, Name = "General"};
+            var category = new Category { Id = id, Name = "General" };
             _context.Categories.Add(category);
             _context.SaveChanges();
             return category;
@@ -60,8 +60,8 @@ namespace HealthSocialMediaUnitTest
         public void PostExists()
         {
             ApplicationDbContext _context = CreateContextTests("tesDb1");
-            var user = CreateDummyUser("sdfaf sdf",_context);
-            var category = CreateDummyCategory(12,_context);
+            var user = CreateDummyUser("sdfaf sdf", _context);
+            var category = CreateDummyCategory(12, _context);
             var description = "My new shoes";
             var imageLink = "../images/example.jpg";
             DateTime createdAt = new DateTime(2019, 3, 25);
@@ -109,10 +109,10 @@ namespace HealthSocialMediaUnitTest
             };
 
             //act
-            PostsController postsController = new PostsController(_context);
+            PostsController postsController = new PostsController(_context,null);
             await postsController.PostPost(postOld);
             await postsController.PostPost(postNew);
-            
+
             postNew = _context.Posts.Where(p => p.Id == 15).FirstOrDefault();
             postNew.CreatedAt = postNew.CreatedAt.AddSeconds(1);
             _context.Posts.Update(postNew);
@@ -130,7 +130,7 @@ namespace HealthSocialMediaUnitTest
                 listIds.Add(dictionary["Id"] as Nullable<int>);
             }
 
-            Assert.Equal(15,listIds.First());
+            Assert.Equal(15, listIds.First());
         }
     }
 }
