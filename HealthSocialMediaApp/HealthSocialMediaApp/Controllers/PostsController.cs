@@ -145,6 +145,7 @@ namespace HealthSocialMediaApp.Controllers
         }
 
         // DELETE: api/Posts/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Post>> DeletePost(int id)
         {
