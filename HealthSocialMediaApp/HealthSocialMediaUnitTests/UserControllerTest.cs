@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
+using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using IdentityServer4.EntityFramework.Options;
@@ -10,11 +11,12 @@ namespace HealthSocialMediaUnitTest
 {
     public class UserControllerTest
     {
-        private ApplicationDbContext _context;
-
-
-        public UserControllerTest()
+        //Write unit test to verify that user data can be accessed with GET
+        [Fact]
+        public void UserExists()
         {
+            //arrange
+            #region context preperation
 
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: "TestDB")
@@ -26,43 +28,57 @@ namespace HealthSocialMediaUnitTest
                     DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
                     PersistedGrants = new TableConfiguration("PersistedGrants")
                 });
-            _context = new ApplicationDbContext(options, operationalStoreOptions);
-        }
+            var context = new ApplicationDbContext(options, operationalStoreOptions);
+            #endregion
 
-        //Write unit test to verify that user data can be accessed with GET
-        [Fact]
-        public void UserExists()
-        {
+            #region data preperation
+
             string email = "Jimmy@mail.com";
-            string username = "Jimmy";
-            string description = "My fitness account";
-            string id = "ojsadkhfaskjdfh";
+            string id = "one-two";
 
             var appUser = new ApplicationUser
             {
-                Email = email,
-                UserName = username,
-                Description = description,
+                Email = "Jimmy@mail.com",
+                UserName = "Jimmy",
+                Description = "My fitness account",
                 Id = id
             };
 
-            _context.Users.Add(appUser);
-            _context.SaveChanges();
+            context.Users.Add(appUser);
+            context.SaveChanges();
+
+            #endregion
 
             //act
-            ApplicationUsersController applicationUsersController = new ApplicationUsersController(_context);
+            ApplicationUsersController applicationUsersController = new ApplicationUsersController(context);
             var result = applicationUsersController.GetUser(id);
 
             // Assert
             Assert.Equal(email, result.Result.Value.Email);
-            Assert.Equal(username, result.Result.Value.UserName);
-            Assert.Equal(description, result.Result.Value.Description);
         }
 
         //Write unit test to verify that user data can be stored with PUT
         [Fact]
         public async void UserIsStored()
         {
+            //arrange
+            #region context preperation
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDB")
+                .Options;
+
+            var operationalStoreOptions = Options.Create(
+                new OperationalStoreOptions
+                {
+                    DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
+                    PersistedGrants = new TableConfiguration("PersistedGrants")
+                });
+            var context = new ApplicationDbContext(options, operationalStoreOptions);
+            #endregion
+
+            #region data preperation
+
             string email = "Jimmy@mail.com";
             string id = "one-two-three";
 
@@ -73,13 +89,14 @@ namespace HealthSocialMediaUnitTest
                 Description = "My fitness account",
                 Id = id
             };
+            #endregion
 
             //act
-            ApplicationUsersController applicationUsersController = new ApplicationUsersController(_context);
+            ApplicationUsersController applicationUsersController = new ApplicationUsersController(context);
             await applicationUsersController.PutApplicationUser(id, appUser);
 
             // Assert
-            Assert.Equal(email, _context.Users.Find(id).Email);
+            Assert.Equal(email, context.Users.Find(id).Email);
         }
     }
 }

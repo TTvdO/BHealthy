@@ -91,6 +91,12 @@
             "metadata": {
                 "description": "The Google Authentication client secret."
             }
+        },
+        "websiteLoadCertificates": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The blueprint(s) of the certificates registered in the azure portal."
+            }
         }
     },
     "resources": [
@@ -119,6 +125,10 @@
                         {
                             "name": "Authentication:Google:ClientSecret",
                             "value": "[parameters('authenticationGoogleClientSecret')]"
+                        },
+                        {
+                            "name": "WEBSITE_LOAD_CERTIFICATES",
+                            "value": "[parameters('websiteLoadCertificates')]"
                         }
                     ],
                     "connectionStrings": [
