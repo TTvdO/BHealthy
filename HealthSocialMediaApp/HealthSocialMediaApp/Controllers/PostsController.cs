@@ -25,6 +25,12 @@ namespace HealthSocialMediaApp.Controllers
             _hostingEnv = hostingEnv;
         }
 
+        //controller for testing purpose
+        public PostsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: api/Posts
         [HttpGet]
         public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId, string userName)

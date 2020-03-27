@@ -124,6 +124,7 @@ const Layout = ({ children }) => {
 					>
 						<ListItemText>My Profile</ListItemText>
 					</ListItem>
+					<Divider />
 					<ListItem
 						button
 						component={RouterLink}
