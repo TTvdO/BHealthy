@@ -4,16 +4,14 @@ using HealthSocialMediaApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HealthSocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200324125531_Add seed for dummy user and post")]
-    partial class Addseedfordummyuserandpost
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,15 +90,15 @@ namespace HealthSocialMediaApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "19214eae-430c-40c5-a6aa-8c93ce16df2a",
+                            Id = "3b1b0486-d436-4b73-b47b-7822ebafb857",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "24734549-5216-4b0a-bfc4-5bc69f848054",
+                            ConcurrencyStamp = "8f67f4f9-89dc-49a5-9525-12845b6a2cb0",
                             Description = "I love sharing healthy tips for beginning health enthusiasts!",
                             Email = "beauhealthy@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "919984af-6f91-42fc-91be-e5af37e1c929",
+                            SecurityStamp = "d031b978-8ae6-4e88-80c0-87a83750553d",
                             TwoFactorEnabled = false,
                             UserName = "Beau Healthy"
                         });
@@ -128,6 +126,21 @@ namespace HealthSocialMediaApp.Migrations
                             Id = 1,
                             Name = "Food"
                         });
+                });
+
+            modelBuilder.Entity("HealthSocialMediaApp.Models.FollowerFollowee", b =>
+                {
+                    b.Property<string>("FollowerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FolloweeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("FollowerId", "FolloweeId");
+
+                    b.HasIndex("FolloweeId");
+
+                    b.ToTable("Followers");
                 });
 
             modelBuilder.Entity("HealthSocialMediaApp.Models.Like", b =>
@@ -166,7 +179,7 @@ namespace HealthSocialMediaApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -190,11 +203,11 @@ namespace HealthSocialMediaApp.Migrations
                         new
                         {
                             Id = -1,
-                            ApplicationUserId = "19214eae-430c-40c5-a6aa-8c93ce16df2a",
+                            ApplicationUserId = "3b1b0486-d436-4b73-b47b-7822ebafb857",
                             CategoryId = 1,
-                            CreatedAt = new DateTime(2020, 3, 24, 13, 55, 31, 411, DateTimeKind.Local).AddTicks(7104),
-                            Description = "Hi guys. I just saw a cool health trick. What do you think?",
-                            ImageLink = "https://img1.thelist.com/img/gallery/weird-but-good-stuff-you-should-be-putting-in-your-smoothie/intro-1498667247.jpg"
+                            CreatedAt = new DateTime(2020, 3, 30, 17, 15, 37, 82, DateTimeKind.Local).AddTicks(9469),
+                            Description = "Delicious strawberries.",
+                            ImageLink = "https://31.media.tumblr.com/a367ee66aafa29b7aa291730a5afe6a6/tumblr_mmho93xEAH1ruw74xo1_250.gif"
                         });
                 });
 
@@ -415,7 +428,22 @@ namespace HealthSocialMediaApp.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-           modelBuilder.Entity("HealthSocialMediaApp.Models.Like", b =>
+            modelBuilder.Entity("HealthSocialMediaApp.Models.FollowerFollowee", b =>
+                {
+                    b.HasOne("HealthSocialMediaApp.Models.ApplicationUser", "Followee")
+                        .WithMany("Followers")
+                        .HasForeignKey("FolloweeId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthSocialMediaApp.Models.ApplicationUser", "Follower")
+                        .WithMany("Followees")
+                        .HasForeignKey("FollowerId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HealthSocialMediaApp.Models.Like", b =>
                 {
                     b.HasOne("HealthSocialMediaApp.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Likes")

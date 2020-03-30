@@ -33,10 +33,16 @@ namespace HealthSocialMediaApp.Data
             builder.Entity<ApplicationUser>().Property(p => p.Description).HasMaxLength(512);
             builder.Entity<ApplicationUser>().HasMany<Post>(c => c.Posts).WithOne(p => p.ApplicationUser);
             builder.Entity<ApplicationUser>().HasMany<Like>(a => a.Likes).WithOne(l => l.ApplicationUser);
+            builder.Entity<ApplicationUser>().HasMany<FollowerFollowee>(a=>a.Followers).WithOne(f=>f.Followee);
+            builder.Entity<ApplicationUser>().HasMany<FollowerFollowee>(a => a.Followees).WithOne(f => f.Follower);
 
             builder.Entity<Like>().HasKey(l => l.Id);
             builder.Entity<Like>().HasOne<Post>(l => l.Post).WithMany(p => p.Likes);
             builder.Entity<Like>().HasOne<ApplicationUser>(l => l.ApplicationUser).WithMany(a => a.Likes);
+
+            builder.Entity<FollowerFollowee>().HasKey(f => new { f.FollowerId, f.FolloweeId });
+            builder.Entity<FollowerFollowee>().HasOne<ApplicationUser>(f=> f.Follower).WithMany(a => a.Followees).OnDelete(DeleteBehavior.ClientCascade);
+            builder.Entity<FollowerFollowee>().HasOne<ApplicationUser>(f => f.Followee).WithMany(a=>a.Followers).OnDelete(DeleteBehavior.ClientCascade);
 
             // Seeding
             var foodCategory = new Category
@@ -71,5 +77,7 @@ namespace HealthSocialMediaApp.Data
         public DbSet<Post> Posts { get; set; }
 
         public DbSet<Like> Likes { get; set; }
+
+        public DbSet<FollowerFollowee> Followers{ get; set; }
     }
 }

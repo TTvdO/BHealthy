@@ -9,6 +9,7 @@ import { ApplicationPaths } from "./components/api-authorization/ApiAuthorizatio
 
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import UserProfile from "./components/UserProfile";
+import { Following } from "./components/Following";
 
 export default class App extends Component {
 	static displayName = App.name;
@@ -25,6 +26,7 @@ export default class App extends Component {
 					component={ApiAuthorizationRoutes}
 				/>
 				<Route path="/privacy-policy" component={PrivacyPolicy} />
+				<Route path="/following" component={Following} />
 			</Layout>
 		);
 	}

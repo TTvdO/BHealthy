@@ -119,6 +119,15 @@ const Layout = ({ children }) => {
 					<ListItem
 						button
 						component={RouterLink}
+						to="/Following"
+						color="inherit"
+					>
+						<ListItemText>Following</ListItemText>
+					</ListItem>
+					<Divider />
+					<ListItem
+						button
+						component={RouterLink}
 						to={`/user/${userName}`}
 						color="inherit"
 					>

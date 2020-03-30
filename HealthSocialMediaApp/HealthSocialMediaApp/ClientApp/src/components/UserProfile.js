@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography, Grid, Container, Avatar } from "@material-ui/core";
+import { Typography, Grid, Container, Avatar, Button } from "@material-ui/core";
 import { red } from "@material-ui/core/colors";
 
 import authService from "./api-authorization/AuthorizeService";
@@ -31,6 +31,14 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
+const getAuthorizationHeaders = token => {
+	return token
+		? {
+			Authorization: `Bearer ${token}`
+		}
+		: {};
+};
+
 const UserProfile = () => {
 	let { userName } = useParams();
 
@@ -47,6 +55,26 @@ const UserProfile = () => {
 			}
 		});
 	}, [setUserId]);
+
+	const Follow = async () => {
+		const token = await authService.getAccessToken();
+		const authorizationHeaders = getAuthorizationHeaders(token);
+		await fetch(`/api/applicationusers/follow?userId=${currentUserId}&followUserName=${userName}`, {
+			method: "PUT",
+			headers: authorizationHeaders
+		});
+
+	};
+
+	const Unfollow = async () => {
+		const token = await authService.getAccessToken();
+		const authorizationHeaders = getAuthorizationHeaders(token);
+		await fetch(`/api/applicationusers/unfollow?userId=${currentUserId}&followUserName=${userName}`, {
+			method: "PUT",
+			headers: authorizationHeaders
+		});
+
+	};
 
 	const [
 		{ posts, isLoading, error },
@@ -69,6 +97,23 @@ const UserProfile = () => {
 						<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
 							<Typography>{posts.length} posts</Typography>
 						</Grid>
+						<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={Follow}
+							>
+								Follow
+							</Button>
+							<Button
+								variant="contained"
+								color="secondary"
+								onClick={Unfollow}
+							>
+								Unfollow
+							</Button>
+						</Grid>
+
 					</Grid>
 
 					<Container maxWidth="sm">

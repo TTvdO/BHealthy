@@ -9,10 +9,13 @@ const getAuthorizationHeaders = token => {
 		: {};
 };
 
-function usePostData(currentUserId, userName) {
+function usePostData(currentUserId, userName, following) {
 	let url = `/api/posts?currentUserId=${currentUserId}`;
 	if (userName) {
-		url = `/api/posts?currentUserId=${currentUserId}&userName=${userName}`;
+		url = url + `&userName=${userName}`;
+	}
+	if (following) {
+		url = url + `&following=${true}`;
 	}
 	const [{ data: posts, isLoading, error }, fetchPosts] = useRestApi(url, []);
 

@@ -119,7 +119,7 @@ namespace HealthSocialMediaUnitTest
             _context.SaveChanges();
 
             //assert
-            var posts = await postsController.GetPosts(null, null);
+            var posts = await postsController.GetPosts(null, null, null);
             List<Nullable<int>> listIds = new List<Nullable<int>>();
             foreach (var post in posts.Value)
             {
