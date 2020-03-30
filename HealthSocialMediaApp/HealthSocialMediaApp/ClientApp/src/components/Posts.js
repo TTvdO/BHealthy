@@ -28,15 +28,8 @@ const useStyles = makeStyles(theme => ({
 		height: 0,
 		paddingTop: "100%"
 	},
-	expand: {
-		transform: "rotate(0deg)",
-		marginLeft: "auto",
-		transition: theme.transitions.create("transform", {
-			duration: theme.transitions.duration.shortest
-		})
-	},
-	expandOpen: {
-		transform: "rotate(180deg)"
+	delete: {
+		marginLeft: "auto"
 	},
 	avatar: {
 		backgroundColor: red[500]
@@ -72,22 +65,6 @@ const Posts = ({ posts, isLoading, error, onDelete, onLikeToggle }) => {
 								{post.userName[0] + post.userName[1]}
 							</Avatar>
 						}
-						action={
-							<IconButton
-								aria-label="delete"
-								onClick={() => {
-									if (
-										window.confirm(
-											"Are you sure you want to delete this post?"
-										)
-									) {
-										onDelete(post.id);
-									}
-								}}
-							>
-								<DeleteIcon />
-							</IconButton>
-						}
 						title={
 							<Link
 								component={RouterLink}
@@ -114,6 +91,21 @@ const Posts = ({ posts, isLoading, error, onDelete, onLikeToggle }) => {
 							onToggle={() => onLikeToggle(post)}
 						/>
 						<Typography>{post.amountOfLikes}</Typography>
+						<IconButton
+							className={classes.delete}
+							aria-label="delete"
+							onClick={() => {
+								if (
+									window.confirm(
+										"Are you sure you want to delete this post?"
+									)
+								) {
+									onDelete(post.id);
+								}
+							}}
+						>
+							<DeleteIcon />
+						</IconButton>
 					</CardActions>
 				</Card>
 			))}
