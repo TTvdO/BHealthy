@@ -1,6 +1,5 @@
 import { UserManager, WebStorageStateStore } from "oidc-client";
 import { ApplicationPaths, ApplicationName } from "./ApiAuthorizationConstants";
-import { Login } from "./Login.js";
 
 export class AuthorizeService {
 	_callbacks = [];
@@ -30,9 +29,6 @@ export class AuthorizeService {
 	async getAccessToken() {
 		await this.ensureUserManagerInitialized();
         const user = await this.userManager.getUser();
-        if(user.expired){
-            this.signIn(Login.getReturnUrl());
-        }
 		return user && user.access_token;
 	}
 

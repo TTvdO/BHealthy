@@ -1,8 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import authService from "./api-authorization/AuthorizeService";
 import InputLabel from "@material-ui/core/InputLabel";
 import { Button, TextField, Typography } from "@material-ui/core";
+import FormControl from "@material-ui/core/FormControl";
+import NativeSelect from "@material-ui/core/NativeSelect";
+import { keys } from "@material-ui/core/styles/createBreakpoints";
 
 const getAuthorizationHeaders = token => {
 	return token
@@ -25,9 +28,30 @@ const PostCreate = ({ onCreate }) => {
 	const classes = useStyles();
 	const [description, setDescription] = useState("");
 	const [imageFile, setImageFile] = useState(null);
+	const [dropdownChoiceId, setDropdownChoiceId] = useState(null);
+	const [dropdownChoices, setDropdownChoices] = useState([]);
 
 	const fileInputRef = useRef(null);
 	const descriptionInputRef = useRef(null);
+
+	useEffect(() => {
+		authService.getAccessToken().then(token => {
+			fetch(`/api/Categories/`, {
+				headers: !token
+					? {}
+					: {
+							Authorization: `Bearer ${token}`,
+							"Content-Type": "application/json;charset=utf-8"
+					  }
+			})
+				.then(response => {
+					return response.json();
+				})
+				.then(allCategories => {
+					setDropdownChoices(allCategories);
+				});
+		});
+	}, []);
 
 	const createPost = async () => {
 		const token = await authService.getAccessToken();
@@ -51,7 +75,7 @@ const PostCreate = ({ onCreate }) => {
 
 		const postData = {
 			applicationUserId: user.sub,
-			categoryId: -1,
+			categoryId: dropdownChoiceId ? parseInt(dropdownChoiceId) : 1,
 			description,
 			imageLink
 		};
@@ -69,6 +93,7 @@ const PostCreate = ({ onCreate }) => {
 		setImageFile(null);
 		fileInputRef.current.value = null;
 		setDescription("");
+		setDropdownChoiceId(null);
 	};
 
 	return (
@@ -95,6 +120,26 @@ const PostCreate = ({ onCreate }) => {
 						setDescription(e.target.value);
 					}}
 				/>
+				<FormControl className={classes.formControl}>
+					<InputLabel htmlFor="category-native-helper">
+					</InputLabel>
+					<NativeSelect
+						value={dropdownChoiceId}
+						onChange={e => {
+							setDropdownChoiceId(e.target.value);
+						}}
+						inputProps={{
+							name: "category",
+							id: "category-native-helper"
+						}}
+					>
+						{dropdownChoices.map(category => (
+							<option value={category.id} key={category.id}>
+								{category.name}
+							</option>
+						))}
+					</NativeSelect>
+				</FormControl>
 				<div>
 					<Button
 						variant="contained"
