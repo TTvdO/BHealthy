@@ -15,7 +15,7 @@ namespace HealthSocialMediaApp.Migrations
             migrationBuilder.InsertData(
                 table: "Posts",
                 columns: new[] { "Id", "ApplicationUserId", "CategoryId", "CreatedAt", "Description", "ImageLink" },
-                values: new object[] { -1, "19214eae-430c-40c5-a6aa-8c93ce16df2a", 1, new DateTime(2020, 3, 24, 13, 55, 31, 411, DateTimeKind.Local).AddTicks(7104), "Delicious strawberries.", "https://66.media.tumblr.com/a367ee66aafa29b7aa291730a5afe6a6/tumblr_mmho93xEAH1ruw74xo1_250.gif" });
+                values: new object[] { -1, "19214eae-430c-40c5-a6aa-8c93ce16df2a", -2, new DateTime(2020, 3, 24, 13, 55, 31, 411, DateTimeKind.Local).AddTicks(7104), "Delicious strawberries.", "https://66.media.tumblr.com/a367ee66aafa29b7aa291730a5afe6a6/tumblr_mmho93xEAH1ruw74xo1_250.gif" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
