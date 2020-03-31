@@ -9,17 +9,17 @@ namespace HealthSocialMediaApp.Migrations
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
-                values: new object[] {-1, "General"});
+                values: new object[] {-7, "General"});
 
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { -2, "Food and Diet" });
+                values: new object[] { -6, "Food and Diet" });
 
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { -3, "Sports" });
+                values: new object[] { -5, "Sports" });
 
             migrationBuilder.InsertData(
                 table: "Categories",
@@ -29,17 +29,17 @@ namespace HealthSocialMediaApp.Migrations
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { -5, "Clothing" });
+                values: new object[] { -3, "Clothing" });
 
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { -6, "Events" });
+                values: new object[] { -2, "Events" });
 
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { -7, "Meditation" });
+                values: new object[] { -1, "Meditation" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
