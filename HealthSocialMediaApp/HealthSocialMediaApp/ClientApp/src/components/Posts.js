@@ -1,8 +1,8 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-
+import Chip from "@material-ui/core/Chip";
 import { makeStyles } from "@material-ui/core/styles";
-import { red } from "@material-ui/core/colors";
+import { blue } from "@material-ui/core/colors";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 import {
@@ -32,7 +32,10 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: "auto"
 	},
 	avatar: {
-		backgroundColor: red[500]
+		backgroundColor: blue[500]
+	},
+	chip: {
+		marginTop: "20%"
 	}
 }));
 
@@ -74,6 +77,13 @@ const Posts = ({ posts, isLoading, error, onDelete, onLikeToggle }) => {
 							</Link>
 						}
 						subheader={new Date(post.createdAt).toLocaleString()}
+						action={
+							<Chip
+								className={classes.chip}
+								color="secondary"
+								label={post.name}
+							/>
+						}
 					/>
 					<CardMedia
 						className={classes.media}

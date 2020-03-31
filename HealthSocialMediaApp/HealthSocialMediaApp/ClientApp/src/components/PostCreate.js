@@ -51,7 +51,7 @@ const PostCreate = ({ onCreate }) => {
 
 		const postData = {
 			applicationUserId: user.sub,
-			categoryId: 1,
+			categoryId: -1,
 			description,
 			imageLink
 		};
