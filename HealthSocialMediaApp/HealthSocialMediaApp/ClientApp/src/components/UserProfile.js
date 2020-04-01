@@ -34,8 +34,8 @@ const useStyles = makeStyles(theme => ({
 const getAuthorizationHeaders = token => {
 	return token
 		? {
-			Authorization: `Bearer ${token}`
-		}
+				Authorization: `Bearer ${token}`
+		  }
 		: {};
 };
 
@@ -45,6 +45,8 @@ const UserProfile = () => {
 	const classes = useStyles();
 
 	const [currentUserId, setUserId] = useState(null);
+	const [isOwnProfile, setIsOwnProfile] = useState(true);
+	const [followingThisUser, setFollowingThisUser] = useState(false);
 
 	useEffect(() => {
 		authService.getUser().then(user => {
@@ -56,24 +58,56 @@ const UserProfile = () => {
 		});
 	}, [setUserId]);
 
+	useEffect(() => {
+		authService.getAccessToken().then(token => {
+			authService.getUser().then(user => {
+				fetch(
+					`/api/applicationusers/follow?currentUserId=${user.sub}&profileUserName=${userName}`,
+					{
+						headers: !token
+							? {}
+							: {
+									Authorization: `Bearer ${token}`,
+									"Content-Type":
+										"application/json;charset=utf-8"
+							  }
+					}
+				)
+					.then(response => {
+						return response.json();
+					})
+					.then(arrayOfBooleans => {
+						setFollowingThisUser(arrayOfBooleans[0]);
+						setIsOwnProfile(arrayOfBooleans[1]);
+					});
+			});
+		});
+	}, [setFollowingThisUser]);
+
 	const Follow = async () => {
+		setFollowingThisUser(true);
 		const token = await authService.getAccessToken();
 		const authorizationHeaders = getAuthorizationHeaders(token);
-		await fetch(`/api/applicationusers/follow?userId=${currentUserId}&followUserName=${userName}`, {
-			method: "PUT",
-			headers: authorizationHeaders
-		});
-
+		await fetch(
+			`/api/applicationusers/follow?userId=${currentUserId}&followUserName=${userName}`,
+			{
+				method: "PUT",
+				headers: authorizationHeaders
+			}
+		);
 	};
 
 	const Unfollow = async () => {
+		setFollowingThisUser(false);
 		const token = await authService.getAccessToken();
 		const authorizationHeaders = getAuthorizationHeaders(token);
-		await fetch(`/api/applicationusers/unfollow?userId=${currentUserId}&followUserName=${userName}`, {
-			method: "PUT",
-			headers: authorizationHeaders
-		});
-
+		await fetch(
+			`/api/applicationusers/unfollow?userId=${currentUserId}&followUserName=${userName}`,
+			{
+				method: "PUT",
+				headers: authorizationHeaders
+			}
+		);
 	};
 
 	const [
@@ -98,24 +132,26 @@ const UserProfile = () => {
 							<Typography>{posts.length} posts</Typography>
 						</Grid>
 						<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-							<Button
-								variant="contained"
-								color="primary"
-								onClick={Follow}
-							>
-								Follow
-							</Button>
-							<Button
-								variant="contained"
-								color="secondary"
-								onClick={Unfollow}
-							>
-								Unfollow
-							</Button>
+							{!isOwnProfile && followingThisUser && (
+								<Button
+									variant="contained"
+									color="secondary"
+									onClick={Unfollow}
+								>
+									Unfollow
+								</Button>
+							)}
+							{!isOwnProfile && !followingThisUser && (
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={Follow}
+								>
+									Follow
+								</Button>
+							)}
 						</Grid>
-
 					</Grid>
-
 					<Container maxWidth="sm">
 						<Typography variant="h5">{`${userName}'s posts`}</Typography>
 					</Container>
