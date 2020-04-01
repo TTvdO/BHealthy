@@ -106,7 +106,7 @@
             "type": "Microsoft.Web/sites",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "Microsoft.Insights/components/bhealthy-insights",
+                "[concat('Microsoft.Insights/components/', parameters('insightsName'))]",
                 "[concat(parameters('sqlServerName'))]",
                 "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
             ],

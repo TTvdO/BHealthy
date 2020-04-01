@@ -1,0 +1,56 @@
+trigger:
+  - master
+
+name: BHealthy.CI
+
+pool:
+  name: Azure Pipelines
+  vmImage: windows-2019
+
+variables:
+  BuildArtifactStagingDirectory: "_BHealthy.CI"
+  BuildConfiguration: "Release"
+  BuildPlatform: "any cpu"
+  Parameters.RestoreBuildProjects: "**/*.csproj"
+  Parameters.TestProjects: "**/*[Tt]ests/*.csproj"
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: Restore
+    inputs:
+      command: restore
+      projects: "$(Parameters.RestoreBuildProjects)"
+
+  - task: DotNetCoreCLI@2
+    displayName: Build
+    inputs:
+      projects: "$(Parameters.RestoreBuildProjects)"
+      arguments: "--configuration $(BuildConfiguration)"
+
+  - task: DotNetCoreCLI@2
+    displayName: Test
+    inputs:
+      command: test
+      projects: "$(Parameters.TestProjects)"
+      arguments: "--configuration $(BuildConfiguration)"
+
+  - task: DotNetCoreCLI@2
+    displayName: Publish
+    inputs:
+      command: publish
+      publishWebProjects: True
+      arguments: "--configuration $(BuildConfiguration) --output $(BuildArtifactStagingDirectory)"
+      zipAfterPublish: True
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: Application Build"
+    inputs:
+      PathtoPublish: "$(BuildArtifactStagingDirectory)"
+    condition: succeededOrFailed()
+
+    # Publish ARM templates used for creating resources in Azure
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: ARM"
+    inputs:
+      PathtoPublish: deployment
+      ArtifactName: ARM

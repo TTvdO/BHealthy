@@ -1,12 +1,10 @@
-# BHealthy Social Medium
+# BHealthy
 
 [![Build status](https://dev.azure.com/hhs-se-s6/Group%204/_apis/build/status/BHealthy.CI)](https://dev.azure.com/hhs-se-s6/Group%204/_build/latest?definitionId=6)
 
 ## Introduction
 
-BHealthy aims to improve the lives of health enthusiasts.
-
-## Getting Started
+BHealthy is a social medium application that aims to improve the lives of health enthusiasts.
 
 ## Installation process
 
@@ -34,7 +32,7 @@ dotnet user-secrets set "Authentication:Google:ClientId" "CLIENT_ID"
 dotnet user-secrets set "Authentication:Google:ClientSecret" "CLIENT_SECRET"
 ```
 
-### 3. Initialize to a local development database
+### 3. Initialize a development database
 
 Run this command in the same directory where in HealthSocialMediaApp.csproj is located to set up a connection to your local database server with the connection string.
 
@@ -57,7 +55,7 @@ Restore NuGet packages.
 dotnet restore
 ```
 
-Install NPM packages for the Single Page Application frontend.
+Install NPM packages for the Single Page Application frontend built with React.
 
 ```bash
 cd ClientApp
@@ -74,4 +72,11 @@ dotnet watch run
 
 ## Build and Test
 
-TODO: Describe and show how to build your code and run the tests.
+The directory HealthSocialMediaApp contains two directories:
+
+- HealthSocialMediaApp, containing the application. Run with `dotnet run` or build with `dotnet build`.
+- HealthSocialMediaUnitTests, containing unit tests. Run with `dotnet test`.
+
+## Azure pipeline and resources
+
+The file 'azure-pipelines.yml' contains the necessary CI steps that are required to build the application in Azure. Besides this, the 'deployment' directory contains the ARM templates for deploying to Azure.
