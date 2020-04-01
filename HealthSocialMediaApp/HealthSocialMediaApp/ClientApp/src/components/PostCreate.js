@@ -28,7 +28,7 @@ const PostCreate = ({ onCreate }) => {
 	const classes = useStyles();
 	const [description, setDescription] = useState("");
 	const [imageFile, setImageFile] = useState(null);
-	const [dropdownChoiceId, setDropdownChoiceId] = useState(null);
+	const [dropdownChoiceId, setDropdownChoiceId] = useState(0);
 	const [dropdownChoices, setDropdownChoices] = useState([]);
 
 	const fileInputRef = useRef(null);
@@ -75,7 +75,7 @@ const PostCreate = ({ onCreate }) => {
 
 		const postData = {
 			applicationUserId: user.sub,
-			categoryId: dropdownChoiceId ? parseInt(dropdownChoiceId) : 1,
+			categoryId: parseInt(dropdownChoiceId),
 			description,
 			imageLink
 		};
@@ -93,7 +93,7 @@ const PostCreate = ({ onCreate }) => {
 		setImageFile(null);
 		fileInputRef.current.value = null;
 		setDescription("");
-		setDropdownChoiceId(null);
+		setDropdownChoiceId(0);
 	};
 
 	return (

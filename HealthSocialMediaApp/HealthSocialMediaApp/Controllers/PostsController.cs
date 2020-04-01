@@ -137,6 +137,11 @@ namespace HealthSocialMediaApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Post>> PostPost([FromBody] Post post)
         {
+            if (post.CategoryId == 0)
+            {
+                post.CategoryId = -7;
+            }
+
             post.CreatedAt = DateTime.Now;
 
             _context.Posts.Add(post);
