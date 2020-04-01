@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import "typeface-roboto";
 import clsx from "clsx";
@@ -21,7 +21,7 @@ import {
 } from "@material-ui/core";
 
 import { LoginMenu } from "./api-authorization/LoginMenu";
-import authService from "./api-authorization/AuthorizeService";
+import { useCurrentUserId } from "./data-hooks/useCurrentUserId";
 
 const useStyles = makeStyles(theme => ({
 	outerContainer: {
@@ -55,22 +55,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Layout = ({ children }) => {
-	const [userName, setUserName] = useState("");
-
-	useEffect(() => {
-		authService.getUser().then(user => {
-			if (user !== null) {
-				setUserName(user.name);
-			}
-		});
-	}, [setUserName]);
-
 	const classes = useStyles();
 
-	//Menu
-	const [anchorEl, setAnchorEl] = useState(null);
-
-	const isMenuOpen = Boolean(anchorEl);
+	const currentUserId = useCurrentUserId();
 
 	// Menu Drawer
 	const [state, setState] = useState({
@@ -97,7 +84,6 @@ const Layout = ({ children }) => {
 			role="presentation"
 			onClick={toggleDrawer(anchor, false)}
 			onKeyDown={toggleDrawer(anchor, false)}
-			flexDirection="column"
 		>
 			<List>
 				<div className={classes.outerContainer}>
@@ -128,7 +114,7 @@ const Layout = ({ children }) => {
 					<ListItem
 						button
 						component={RouterLink}
-						to={`/user/${userName}`}
+						to={`/user/${currentUserId}`}
 						color="inherit"
 					>
 						<ListItemText>My Profile</ListItemText>
@@ -168,10 +154,6 @@ const Layout = ({ children }) => {
 			</List>
 		</div>
 	);
-
-	const handleMenuClose = () => {
-		setAnchorEl(null);
-	};
 
 	return (
 		<>

@@ -1,4 +1,5 @@
-import authService from "./api-authorization/AuthorizeService";
+import authService from "../api-authorization/AuthorizeService";
+
 import { useRestApi } from "./useRestApi";
 
 const getAuthorizationHeaders = token => {
@@ -9,10 +10,10 @@ const getAuthorizationHeaders = token => {
 		: {};
 };
 
-function usePostData(currentUserId, userName, following) {
+function usePostData(currentUserId, userId, following) {
 	let url = `/api/posts?currentUserId=${currentUserId}`;
-	if (userName) {
-		url = url + `&userName=${userName}`;
+	if (userId) {
+		url = url + `&userId=${userId}`;
 	}
 	if (following) {
 		url = url + `&following=${true}`;

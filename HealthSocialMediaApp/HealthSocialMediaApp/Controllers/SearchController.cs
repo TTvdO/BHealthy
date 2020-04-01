@@ -28,6 +28,7 @@ namespace HealthSocialMediaApp.Controllers
                                             where (user.UserName.ToLower().Trim().Contains(searchInput.ToLower().Trim()))
                                             select new
                                             {
+                                                user.Id,
                                                 user.UserName
                                             }).ToListAsync();
 

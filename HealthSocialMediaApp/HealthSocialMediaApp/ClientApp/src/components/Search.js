@@ -8,6 +8,7 @@ import { Link } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	searchDiv: {
+		marginTop: "16px",
 		flexGrow: 1
 	},
 	searchComponent: {
@@ -39,11 +40,11 @@ const Search = () => {
 
 	const handleKeyDown = e => {
 		if (e.key === "Enter") {
-			callController();
+			searchUsers();
 		}
 	};
 
-	const callController = () => {
+	const searchUsers = () => {
 		authService.getAccessToken().then(token => {
 			fetch(`/api/search?searchInput=${query}`, {
 				headers: !token
@@ -67,11 +68,7 @@ const Search = () => {
 			<Grid height="100%" className={classes.searchGrid} xs={12}>
 				<Paper className={classes.searchGridPaper}>
 					<div className={classes.searchComponent}>
-						<div className={classes.searchIconDiv}>
-							<SearchIcon
-								className={classes.searchIcon}
-							></SearchIcon>
-						</div>
+						<SearchIcon className={classes.searchIcon}></SearchIcon>
 						<InputBase
 							className={classes.searchInput}
 							placeholder="Search..."
@@ -84,15 +81,15 @@ const Search = () => {
 			<div>
 				{!users.length > 0 && <h2>No results found</h2>}
 				{users.length > 0 &&
-					users.map((value, index) => {
+					users.map((user, index) => {
 						return (
 							<div className={classes.individualUser}>
 								<Link
 									component={RouterLink}
-									to={`/user/${value.userName}`}
+									to={`/user/${user.id}`}
 									key={index}
 								>
-									{value.userName}
+									{user.userName}
 								</Link>
 							</div>
 						);

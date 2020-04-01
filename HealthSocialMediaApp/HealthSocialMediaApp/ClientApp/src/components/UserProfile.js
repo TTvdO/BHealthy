@@ -2,27 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography, Grid, Container, Avatar, Button } from "@material-ui/core";
-import { red } from "@material-ui/core/colors";
+import { Typography, Grid, Container } from "@material-ui/core";
 
 import authService from "./api-authorization/AuthorizeService";
 
 import { Posts } from "./Posts";
-import { usePostData } from "./usePostData";
+import { UserProfileInfo } from "./UserProfileInfo";
+
+import { useCurrentUserId } from "./data-hooks/useCurrentUserId";
+import { useUserData } from "./data-hooks/useUserData";
+import { usePostData } from "./data-hooks/usePostData";
 
 const useStyles = makeStyles(theme => ({
-	root: {
-		flexGrow: 1
-	},
-	Media: {
-		width: "100%",
-		maxWidth: "150px",
-		height: "150px",
-		[theme.breakpoints.down("sm")]: {
-			margin: "0 auto 20px auto"
-		},
-		backgroundColor: red[500]
-	},
 	itemAlign: {
 		marginTop: "50px",
 		[theme.breakpoints.down("sm")]: {
@@ -40,56 +31,48 @@ const getAuthorizationHeaders = token => {
 };
 
 const UserProfile = () => {
-	let { userName } = useParams();
+	let { userId } = useParams();
+
+	const { user, isLoading: isUserLoading, error: userError } = useUserData(
+		userId
+	);
 
 	const classes = useStyles();
 
-	const [currentUserId, setUserId] = useState(null);
-	const [isOwnProfile, setIsOwnProfile] = useState(true);
+	const currentUserId = useCurrentUserId();
+
 	const [followingThisUser, setFollowingThisUser] = useState(false);
+	const [isOwnProfile, setIsOwnProfile] = useState(true);
 
 	useEffect(() => {
-		authService.getUser().then(user => {
-			if (user) {
-				setUserId(user.sub);
-			} else {
-				setUserId(null);
-			}
-		});
-	}, [setUserId]);
+		setIsOwnProfile(userId === currentUserId);
+	}, [userId, currentUserId]);
 
 	useEffect(() => {
 		authService.getAccessToken().then(token => {
 			authService.getUser().then(user => {
 				fetch(
-					`/api/applicationusers/follow?currentUserId=${user.sub}&profileUserName=${userName}`,
+					`/api/applicationusers/follow?currentUserId=${user.sub}&profileUserId=${userId}`,
 					{
-						headers: !token
-							? {}
-							: {
-									Authorization: `Bearer ${token}`,
-									"Content-Type":
-										"application/json;charset=utf-8"
-							  }
+						headers: getAuthorizationHeaders(token)
 					}
 				)
 					.then(response => {
 						return response.json();
 					})
-					.then(arrayOfBooleans => {
-						setFollowingThisUser(arrayOfBooleans[0]);
-						setIsOwnProfile(arrayOfBooleans[1]);
+					.then(isFollowingUser => {
+						setFollowingThisUser(isFollowingUser);
 					});
 			});
 		});
-	}, [setFollowingThisUser]);
+	}, [setFollowingThisUser, userId]);
 
-	const Follow = async () => {
+	const handleFollow = async () => {
 		setFollowingThisUser(true);
 		const token = await authService.getAccessToken();
 		const authorizationHeaders = getAuthorizationHeaders(token);
 		await fetch(
-			`/api/applicationusers/follow?userId=${currentUserId}&followUserName=${userName}`,
+			`/api/applicationusers/follow?userId=${currentUserId}&followUserName=${user.userName}`,
 			{
 				method: "PUT",
 				headers: authorizationHeaders
@@ -97,12 +80,12 @@ const UserProfile = () => {
 		);
 	};
 
-	const Unfollow = async () => {
+	const handleUnfollow = async () => {
 		setFollowingThisUser(false);
 		const token = await authService.getAccessToken();
 		const authorizationHeaders = getAuthorizationHeaders(token);
 		await fetch(
-			`/api/applicationusers/unfollow?userId=${currentUserId}&followUserName=${userName}`,
+			`/api/applicationusers/unfollow?userId=${currentUserId}&followUserName=${user.userName}`,
 			{
 				method: "PUT",
 				headers: authorizationHeaders
@@ -111,66 +94,55 @@ const UserProfile = () => {
 	};
 
 	const [
-		{ posts, isLoading, error },
+		{ posts, isLoading: isPostsLoading, error: postsError },
 		{ handleDelete, handleLikeToggle }
-	] = usePostData(currentUserId, userName);
+	] = usePostData(currentUserId, userId);
 
 	return (
-		<>
-			<Container maxWidth="md">
-				<Grid container className={classes.itemAlign}>
-					<Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
-						<Avatar className={classes.Media}>
-							{userName[0] + userName[1]}
-						</Avatar>
-					</Grid>
-					<Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
-						<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-							<Typography variant="h4">{userName}</Typography>
-						</Grid>
-						<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-							<Typography>{posts.length} posts</Typography>
-						</Grid>
-						<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-							{!isOwnProfile && followingThisUser && (
-								<Button
-									variant="contained"
-									color="secondary"
-									onClick={Unfollow}
-								>
-									Unfollow
-								</Button>
-							)}
-							{!isOwnProfile && !followingThisUser && (
-								<Button
-									variant="contained"
-									color="primary"
-									onClick={Follow}
-								>
-									Follow
-								</Button>
-							)}
-						</Grid>
-					</Grid>
-					<Container maxWidth="sm">
-						<Typography variant="h5">{`${userName}'s posts`}</Typography>
-					</Container>
-					<Grid
-						container
-						justify="space-evenly"
-						className={classes.itemAlign}
-					>
-						<Posts
-							posts={posts}
-							isLoading={isLoading}
-							error={error}
-							onDelete={handleDelete}
-							onLikeToggle={handleLikeToggle}
-						></Posts>
-					</Grid>
-				</Grid>
-			</Container>
-		</>
+		<Container maxWidth="md">
+			<Grid container className={classes.itemAlign}>
+				{!isUserLoading && !userError && user && (
+					<>
+						<UserProfileInfo
+							user={user}
+							onFollow={handleFollow}
+							onUnfollow={handleUnfollow}
+							isOwnProfile={isOwnProfile}
+							isFollowingThisUser={followingThisUser}
+							amountOfPosts={posts.length}
+						></UserProfileInfo>
+						<Container maxWidth="sm">
+							<Typography variant="h5">{`${user.userName}'s posts`}</Typography>
+						</Container>
+					</>
+				)}
+
+				{!isUserLoading &&
+					!isPostsLoading &&
+					!userError &&
+					!postsError && (
+						<>
+							<Grid
+								container
+								justify="space-evenly"
+								className={classes.itemAlign}
+							>
+								<Posts
+									posts={posts}
+									isLoading={isPostsLoading}
+									error={postsError}
+									onDelete={handleDelete}
+									onLikeToggle={handleLikeToggle}
+								></Posts>
+							</Grid>
+						</>
+					)}
+
+				{(postsError || userError) && (
+					<Typography>Error while loading profile.</Typography>
+				)}
+			</Grid>
+		</Container>
 	);
 };
 

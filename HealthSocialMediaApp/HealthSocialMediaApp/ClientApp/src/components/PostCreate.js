@@ -5,7 +5,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import { Button, TextField, Typography } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import NativeSelect from "@material-ui/core/NativeSelect";
-import { keys } from "@material-ui/core/styles/createBreakpoints";
 
 const getAuthorizationHeaders = token => {
 	return token
@@ -121,8 +120,7 @@ const PostCreate = ({ onCreate }) => {
 					}}
 				/>
 				<FormControl className={classes.formControl}>
-					<InputLabel htmlFor="category-native-helper">
-					</InputLabel>
+					<InputLabel htmlFor="category-native-helper"></InputLabel>
 					<NativeSelect
 						value={dropdownChoiceId}
 						onChange={e => {

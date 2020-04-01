@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Container, Typography } from "@material-ui/core";
 
-import authService from "./api-authorization/AuthorizeService";
-
 import { PostCreate } from "./PostCreate";
 import { Posts } from "./Posts";
-import { usePostData } from "./usePostData";
+import { usePostData } from "./data-hooks/usePostData";
+import { useCurrentUserId } from "./data-hooks/useCurrentUserId";
 
 const Home = () => {
-	const [currentUserId, setUserId] = useState(null);
-
-	useEffect(() => {
-		authService.getUser().then(user => {
-			if (user) {
-				setUserId(user.sub);
-			} else {
-				setUserId(null);
-			}
-		});
-	}, [setUserId]);
+	const currentUserId = useCurrentUserId();
 
 	const [
 		{ posts, isLoading, error },
@@ -39,7 +28,7 @@ const Home = () => {
 				error={error}
 				onDelete={handleDelete}
 				onLikeToggle={handleLikeToggle}
-			></Posts>{" "}
+			></Posts>
 		</Container>
 	);
 };

@@ -109,7 +109,7 @@ namespace HealthSocialMediaUnitTest
             };
 
             //act
-            PostsController postsController = new PostsController(_context,null);
+            PostsController postsController = new PostsController(_context, null);
             await postsController.PostPost(postOld);
             await postsController.PostPost(postNew);
 
@@ -126,7 +126,6 @@ namespace HealthSocialMediaUnitTest
                 //code to get parameter of an anonymous object (System.Collections.Generic in Controller made it hard to get specific attribute of the object found).
                 //see https://stackoverflow.com/a/14877416 + https://docs.microsoft.com/en-us/dotnet/api/system.web.routing.routevaluedictionary?view=netframework-4.8
                 var dictionary = new RouteValueDictionary(post);
-                Console.WriteLine(dictionary["CreatedAt"] as Nullable<DateTime>);
                 listIds.Add(dictionary["Id"] as Nullable<int>);
             }
 

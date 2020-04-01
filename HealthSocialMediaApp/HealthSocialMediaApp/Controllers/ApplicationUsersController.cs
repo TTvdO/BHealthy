@@ -27,9 +27,20 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/applicationusers/a0e61ab9-ef88-470e-b0f0-9e06b1542c4f
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApplicationUser>> GetUser(string id)
+        public async Task<ActionResult<object>> GetUser(string id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await (from u in _context.Users
+                              where u.Id == id
+                              select new
+                              {
+                                  u.Id,
+                                  u.UserName,
+                                  u.Description,
+                                  u.Email,
+                                  u.Followees,
+                                  u.Followers
+                              }
+            ).FirstOrDefaultAsync();
 
             if (user == null)
             {
@@ -39,104 +50,65 @@ namespace HealthSocialMediaApp.Controllers
             return user;
         }
 
+        // PUT: api/applicationusers
+        [HttpPut]
+        public async Task<IActionResult> PutApplicationUser([FromBody] ApplicationUser editedApplicationUser)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == editedApplicationUser.Id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.UserName = editedApplicationUser.UserName;
+            user.Description = editedApplicationUser.Description;
+
+            await _context.SaveChangesAsync();
+
+            return StatusCode(200);
+        }
+
         // GET: api/applicationusers/follow
         [HttpGet("follow")]
-        public async Task<ActionResult<bool[]>> GetFollowingUser(string currentUserId, string profileUserName)
+        public async Task<ActionResult<bool>> GetFollowingUser(string currentUserId, string profileUserId)
         {
-            bool[] followingProfileAndIsOwnProfile = new bool[2];
-            bool followingCurrentProfile = false;
-            bool isOwnProfile = false;
-
             var currentApplicationUser = await _context.Users.FindAsync(currentUserId);
-
             if (currentApplicationUser == null)
             {
                 return NotFound();
             }
 
-            //change to comparing ID's asap when this is changed in the front-end
-            if (currentApplicationUser.UserName.Equals(profileUserName))
+            var userToFollow = await _context.Users.FindAsync(profileUserId);
+            if (userToFollow == null)
             {
-                followingCurrentProfile = true;
-                isOwnProfile = true;
+                return NotFound();
             }
 
-            else
+            bool followingCurrentProfile = false;
+            if (_context.Followers.Any())
             {
-                if (_context.Followers != null)
+                foreach (FollowerFollowee followerFollowee in _context.Followers)
                 {
-                    if (_context.Followers.Any())
+                    if (followerFollowee.FollowerId.Equals(currentUserId) &&
+                        followerFollowee.FolloweeId.Equals(profileUserId))
                     {
-                        //lookup user behind profile based on name, change to based on id asap when changed in front-end
-                        ApplicationUser profileApplicationUser = null;
-                        foreach (ApplicationUser applicationUser in _context.Users)
-                        {
-                            if (applicationUser.UserName.Equals(profileUserName))
-                            {
-                                profileApplicationUser = applicationUser;
-                            }
-                        }
-
-                        foreach (FollowerFollowee followerFollowee in _context.Followers)
-                        {
-                            if (followerFollowee.FollowerId.Equals(currentUserId) &&
-                                followerFollowee.FolloweeId.Equals(profileApplicationUser.Id))
-                            {
-                                followingCurrentProfile = true;
-                            }
-                        }
+                        followingCurrentProfile = true;
                     }
-
                 }
             }
 
-            followingProfileAndIsOwnProfile[0] = followingCurrentProfile;
-            followingProfileAndIsOwnProfile[1] = isOwnProfile;
-            return followingProfileAndIsOwnProfile;
+            return followingCurrentProfile;
         }
 
-        // PUT: api/applicationuser/a0e61ab9-ef88-470e-b0f0-9e06b1542c4f
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutApplicationUser(string id, [FromBody] ApplicationUser applicationUser)
-        {
-            if (id != applicationUser.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(applicationUser).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ApplicationUserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-
-        // PUT: api/applicationuser/follow
+        // PUT: api/applicationusers/follow
         [Authorize]
         [HttpPut("follow")]
         public async Task<IActionResult> PutFollow(string userId, string followUserName)
         {
-            //GET FOLLOW USER ID
-            string followId = _context.Users.Where(o => o.UserName == followUserName).FirstOrDefault().Id;
+            string followeeId = _context.Users.Where(o => o.UserName == followUserName).FirstOrDefault().Id;
 
-            if (followId == userId)
+            if (followeeId == userId)
             {
                 return BadRequest();
             }
@@ -144,7 +116,7 @@ namespace HealthSocialMediaApp.Controllers
             var follow = new FollowerFollowee
             {
                 FollowerId = userId,
-                FolloweeId = followId
+                FolloweeId = followeeId
             };
 
             _context.Followers.Add(follow);
@@ -168,7 +140,7 @@ namespace HealthSocialMediaApp.Controllers
             return NoContent();
         }
 
-        // PUT: api/applicationuser/unfollow
+        // PUT: api/applicationusers/unfollow
         [Authorize]
         [HttpPut("unfollow")]
         public async Task<IActionResult> PutUnFollow(string userId, string followUserName)
@@ -179,7 +151,6 @@ namespace HealthSocialMediaApp.Controllers
             {
                 return BadRequest();
             }
-
 
             _context.Followers.Remove(follow);
 
@@ -206,8 +177,5 @@ namespace HealthSocialMediaApp.Controllers
         {
             return _context.Users.Any(a => a.Id == id);
         }
-
     }
-
-
 }

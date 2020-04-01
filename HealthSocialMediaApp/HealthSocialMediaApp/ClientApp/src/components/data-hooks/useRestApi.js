@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 
+/**
+ * Use this for getting user data only
+ * @param {*} userId the user to get data from
+ */
 function useRestApi(initialUrl, initialData) {
 	const [data, setData] = useState(initialData);
 	const [isLoading, setIsLoading] = useState(false);

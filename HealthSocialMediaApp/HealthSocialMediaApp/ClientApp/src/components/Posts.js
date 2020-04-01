@@ -71,7 +71,7 @@ const Posts = ({ posts, isLoading, error, onDelete, onLikeToggle }) => {
 						title={
 							<Link
 								component={RouterLink}
-								to={`/user/${post.userName}`}
+								to={`/user/${post.userId}`}
 							>
 								{post.userName}
 							</Link>

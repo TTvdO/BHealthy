@@ -26,12 +26,12 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId, string userName, bool? following)
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId, string userId, bool? following)
         {
             var post = await (from p in _context.Posts
                               let likeCount = (from like in _context.Likes where like.PostId == p.Id select like.Id).Count()
                               let likedByUser = currentUserId != null ? (from like in _context.Likes where like.PostId == p.Id && like.ApplicationUserId == currentUserId select like.Id).Any() : false
-                              where (userName != null ? p.ApplicationUser.UserName == userName : true)
+                              where (userId != null ? p.ApplicationUser.Id == userId : true)
                               where (following != null ? _context.Followers.Where(d => d.FollowerId == currentUserId).Select(r => r.FolloweeId).Contains(p.ApplicationUserId) : true)
                               select new
                               {
@@ -42,7 +42,7 @@ namespace HealthSocialMediaApp.Controllers
                                   p.Category.Name,
                                   p.CreatedAt,
                                   p.ApplicationUser.UserName,
-                                  p.ApplicationUserId,
+                                  UserId = p.ApplicationUserId,
                                   amountOfLikes = likeCount,
                                   isLikedByCurrentUser = likedByUser
                               }).OrderByDescending(d => d.CreatedAt).ToListAsync();

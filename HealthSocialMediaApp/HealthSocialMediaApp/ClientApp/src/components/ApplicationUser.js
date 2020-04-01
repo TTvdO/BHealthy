@@ -1,55 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Button, Box, TextField } from "@material-ui/core";
+import { Button, Box, TextField, Typography } from "@material-ui/core";
 import authService from "./api-authorization/AuthorizeService";
 
+import { useCurrentUserId } from "./data-hooks/useCurrentUserId";
+import { fetchUserData } from "./data-hooks/useUserData";
+
 const ApplicationUser = () => {
-	const [applicationUserData, setApplicationUserData] = useState({
-		user: {},
-		isLoading: false,
-		error: null
-	});
+	const currentUserId = useCurrentUserId();
+
+	const [userData, setUserData] = useState({});
 
 	useEffect(() => {
-		setApplicationUserData({ user: {}, isLoading: true, error: undefined });
-		authService.getAccessToken().then(token => {
-			authService.getUser().then(user => {
-				fetch(`/api/applicationusers/${user.sub}`, {
-					headers: !token
-						? {}
-						: {
-								Authorization: `Bearer ${token}`,
-								"Content-Type": "application/json;charset=utf-8"
-						  }
-				})
-					.then(response => {
-						return response.json();
-					})
-					.then(user => {
-						setApplicationUserData({
-							user: user,
-							isLoading: false,
-							error: undefined
-						});
-					})
-					.catch(error => {
-						setApplicationUserData({
-							user: {},
-							isLoading: false,
-							error
-						});
-					});
-			});
+		fetchUserData(currentUserId).then(user => {
+			setUserData(user);
 		});
-	}, [setApplicationUserData]);
+	}, [setUserData, currentUserId]);
 
 	const updateUserAttributes = () => {
 		authService.getAccessToken().then(token => {
 			// Send authorization token so the backend can verify the user.
 			authService.getUser().then(user => {
-				console.log("user", user);
 				fetch(`/api/applicationusers/${user.sub}`, {
 					method: "PUT",
-					body: JSON.stringify(applicationUserData.user),
+					body: JSON.stringify(userData),
 					headers: !token
 						? {}
 						: {
@@ -62,69 +35,40 @@ const ApplicationUser = () => {
 	};
 
 	return (
-		<form noValidate autocomplete="off">
+		<form noValidate>
+			<Typography variant="h4">My Account</Typography>
 			<Box display="flex" flexDirection="column">
-				<label for="id-label">ID</label>
-				<TextField
-					id="id-label"
-					variant="filled"
-					inputProps={{ disabled: true }}
-					value={applicationUserData.user.id}
-					onChange={e => {
-						setApplicationUserData({
-							...applicationUserData,
-							user: {
-								...applicationUserData.user,
-								id: e.target.value
-							}
-						});
-					}}
-				></TextField>
-				<label for="email-label">Email</label>
-				<TextField
-					id="email-label"
-					variant="filled"
-					inputProps={{ disabled: true }}
-					value={applicationUserData.user.email}
-					onChange={e => {
-						setApplicationUserData({
-							...applicationUserData,
-							user: {
-								...applicationUserData.user,
-								email: e.target.value
-							}
-						});
-					}}
-				></TextField>
-				<label for="username-label">Username</label>
+				<label htmlFor="id-label">ID</label>
+				<Typography>{userData.id}</Typography>
+				<label htmlFor="email-label">Email</label>
+				<Typography>{userData.email}</Typography>
+				<label htmlFor="username-label">Username</label>
 				<TextField
 					id="username-label"
-					value={applicationUserData.user.userName}
+					value={userData.userName}
 					onChange={e => {
-						setApplicationUserData({
-							...applicationUserData,
-							user: {
-								...applicationUserData.user,
-								userName: e.target.value
-							}
+						setUserData({
+							...userData,
+							userName: e.target.value
 						});
 					}}
 				></TextField>
-				<label for="description-label">Description</label>
+				<label htmlFor="description-label">Description</label>
 				<TextField
 					id="description-label"
-					value={applicationUserData.user.description}
+					value={userData.description}
 					onChange={e => {
-						setApplicationUserData({
-							...applicationUserData,
-							user: {
-								...applicationUserData.user,
-								description: e.target.value
-							}
+						setUserData({
+							...userData,
+							description: e.target.value
 						});
 					}}
 				></TextField>
-				<Button variant="contained" onClick={updateUserAttributes}>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={updateUserAttributes}
+				>
 					Submit
 				</Button>
 			</Box>
