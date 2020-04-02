@@ -29,19 +29,22 @@ export class AuthorizeService {
 	async getAccessToken() {
 		await this.ensureUserManagerInitialized();
 		const user = await this.userManager.getUser();
-		if (user.expired === true) {
-			try {
-				//Attempt to sign in our user silently
-				const silentUser = await this.userManager.signinSilent(
-					user.refresh_token
-				);
-				//Return refreshed access token
-				return silentUser && silentUser.access_token;
-			} catch (err) {
-				//Failed to sign in user silently
-				//Sign out user or do something similar
+		if (user != null) {
+			if (user.expired === true) {
+				try {
+					//Attempt to sign in our user silently
+					const silentUser = await this.userManager.signinSilent(
+						user.refresh_token
+					);
+					//Return refreshed access token
+					return silentUser && silentUser.access_token;
+				} catch (err) {
+					//Failed to sign in user silently
+					//Sign out user or do something similar
+				}
 			}
 		}
+
 		return user && user.access_token;
 	}
 
