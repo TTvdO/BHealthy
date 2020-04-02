@@ -3,7 +3,7 @@ import React from "react";
 import { Typography, Grid, Avatar, Button, Box } from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { red } from "@material-ui/core/colors";
+import { blue } from "@material-ui/core/colors";
 
 const useStyles = makeStyles(theme => ({
 	media: {
@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
 		[theme.breakpoints.down("sm")]: {
 			margin: "0 auto 20px auto"
 		},
-		backgroundColor: red[500]
+		backgroundColor: blue[500]
 	},
 	profileInfo: {
 		[theme.breakpoints.down("sm")]: {
@@ -42,7 +42,9 @@ const UserProfileInfo = ({
 		<>
 			<Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
 				<Avatar className={classes.media}>
-					{user.userName[0] + user.userName[1]}
+					<Typography variant="h2">
+						{user.userName[0] + user.userName[1]}
+					</Typography>
 				</Avatar>
 			</Grid>
 			<Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
@@ -52,12 +54,16 @@ const UserProfileInfo = ({
 				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
 					<Box display="flex" className={classes.profileInfo}>
 						<Box className={classes.profileInfoItem}>
-							<Typography>Posts</Typography>
+							<Typography variant="h6">Posts</Typography>
 							<Typography>{amountOfPosts}</Typography>
 						</Box>
 						<Box className={classes.profileInfoItem}>
-							<Typography>Follows</Typography>
+							<Typography variant="h6">Follows</Typography>
 							<Typography>{user.followees.length}</Typography>
+						</Box>
+						<Box className={classes.profileInfoItem}>
+							<Typography variant="h6">Followers</Typography>
+							<Typography>{user.followers.length}</Typography>
 						</Box>
 					</Box>
 				</Grid>

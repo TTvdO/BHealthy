@@ -111,9 +111,6 @@ const UserProfile = () => {
 							isFollowingThisUser={followingThisUser}
 							amountOfPosts={posts.length}
 						></UserProfileInfo>
-						<Container maxWidth="sm">
-							<Typography variant="h5">{`${user.userName}'s posts`}</Typography>
-						</Container>
 					</>
 				)}
 
