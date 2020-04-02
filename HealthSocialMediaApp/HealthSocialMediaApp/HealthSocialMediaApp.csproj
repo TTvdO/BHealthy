@@ -8,6 +8,7 @@
         <SpaRoot>ClientApp\</SpaRoot>
         <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
         <UserSecretsId>5fa068fd-245b-4e1e-8b9a-8ca7459491ca</UserSecretsId>
+        <ProjectGuid>{478357df-e8bf-4a1a-98ee-add5be779519}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.2" />

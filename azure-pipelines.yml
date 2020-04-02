@@ -8,13 +8,21 @@ pool:
   vmImage: windows-2019
 
 variables:
-  BuildArtifactStagingDirectory: "_BHealthy.CI"
+  Build.ArtifactStagingDirectory: "_BHealthy.CI"
   BuildConfiguration: "Release"
   BuildPlatform: "any cpu"
   Parameters.RestoreBuildProjects: "**/*.csproj"
   Parameters.TestProjects: "**/*[Tt]ests/*.csproj"
 
 steps:
+  - task: SonarQubePrepare@4
+    displayName: "Prepare SonarQube analysis"
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    inputs:
+      SonarQube: "SonarQube_Group4"
+      projectKey: "group-4"
+      projectName: "Group 4"
+
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
@@ -34,21 +42,28 @@ steps:
       projects: "$(Parameters.TestProjects)"
       arguments: "--configuration $(BuildConfiguration)"
 
+  - task: SonarQubeAnalyze@4
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: "Run Code Analysis"
+
+  - task: SonarQubePublish@4
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: "Publish Quality Gate Result"
+
   - task: DotNetCoreCLI@2
     displayName: Publish
     inputs:
       command: publish
       publishWebProjects: True
-      arguments: "--configuration $(BuildConfiguration) --output $(BuildArtifactStagingDirectory)"
+      arguments: "--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)"
       zipAfterPublish: True
 
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: Application Build"
     inputs:
-      PathtoPublish: "$(BuildArtifactStagingDirectory)"
+      PathtoPublish: "$(Build.ArtifactStagingDirectory)"
     condition: succeededOrFailed()
 
-    # Publish ARM templates used for creating resources in Azure
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: ARM"
     inputs:
