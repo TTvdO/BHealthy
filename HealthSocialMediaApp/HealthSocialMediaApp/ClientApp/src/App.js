@@ -11,6 +11,8 @@ import { Search } from "./components/Search";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import UserProfile from "./components/UserProfile";
 import { Following } from "./components/Following";
+import { UserFollowing } from "./components/UserFollowing";
+import { UserFollowers } from "./components/UserFollowers";
 
 function App() {
 	return (
@@ -19,6 +21,8 @@ function App() {
 			<Route path="/account" component={ApplicationUser} />
 			<Route path="/search" component={Search} />
 			<Route path="/user/:userId" component={UserProfile} />
+            <Route path="/follows/:userId/" component={UserFollowing}/>
+            <Route path="/followers/:userId/" component={UserFollowers}/>
 			<Route
 				path={ApplicationPaths.ApiAuthorizationPrefix}
 				component={ApiAuthorizationRoutes}

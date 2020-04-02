@@ -5,6 +5,9 @@ import { Typography, Grid, Avatar, Button, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
 
+import { Link as RouterLink } from "react-router-dom";
+import { Link } from "@material-ui/core";
+
 const useStyles = makeStyles(theme => ({
 	media: {
 		width: "100%",
@@ -58,11 +61,31 @@ const UserProfileInfo = ({
 							<Typography>{amountOfPosts}</Typography>
 						</Box>
 						<Box className={classes.profileInfoItem}>
-							<Typography variant="h6">Follows</Typography>
+							<Typography>
+								<Link
+									component={RouterLink}
+									to={`/follows/${user.id}`}
+									key={user.id}
+								>
+                                    <Typography variant="h6">Follows</Typography>
+									
+								</Link>
+							</Typography>
 							<Typography>{user.followees.length}</Typography>
 						</Box>
 						<Box className={classes.profileInfoItem}>
-							<Typography variant="h6">Followers</Typography>
+                        <Box className={classes.profileInfoItem}>
+							<Typography>
+								<Link
+									component={RouterLink}
+									to={`/followers/${user.id}`}
+									key={user.id}
+								>
+                                    <Typography variant="h6">Followers</Typography>
+									
+								</Link>
+							</Typography>
+						</Box>
 							<Typography>{user.followers.length}</Typography>
 						</Box>
 					</Box>

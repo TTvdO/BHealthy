@@ -66,36 +66,36 @@ namespace HealthSocialMediaApp.Controllers
             return StatusCode(200);
         }
 
-        // GET: api/applicationusers/follow
-        [HttpGet("follow")]
-        public async Task<ActionResult<bool>> GetFollowingUser(string currentUserId, string profileUserId)
+        // GET: api/applicationusers/follows/id
+        [HttpGet("follows")]
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollows(string profileUserId, string currentUserId)
         {
-            var currentApplicationUser = await _context.Users.FindAsync(currentUserId);
-            if (currentApplicationUser == null)
-            {
-                return NotFound();
-            }
+            var users = await (from user in _context.Users
+                               join followerfollowee in _context.Followers on user.Id equals followerfollowee.FolloweeId
+                               where followerfollowee.FollowerId == profileUserId
+                               select new
+                               {
+                                   user.Id,
+                                   user.UserName,
+                                   user.Description
+                               }).ToListAsync();
+            return users;
+        }
 
-            var userToFollow = await _context.Users.FindAsync(profileUserId);
-            if (userToFollow == null)
-            {
-                return NotFound();
-            }
-
-            bool followingCurrentProfile = false;
-            if (_context.Followers.Any())
-            {
-                foreach (FollowerFollowee followerFollowee in _context.Followers)
-                {
-                    if (followerFollowee.FollowerId.Equals(currentUserId) &&
-                        followerFollowee.FolloweeId.Equals(profileUserId))
-                    {
-                        followingCurrentProfile = true;
-                    }
-                }
-            }
-
-            return followingCurrentProfile;
+        // GET: api/applicationusers/follows/id
+        [HttpGet("followers")]
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollowers(string profileUserId, string currentUserId)
+        {
+            var users = await (from user in _context.Users
+                               join followerfollowee in _context.Followers on user.Id equals followerfollowee.FollowerId
+                               where followerfollowee.FolloweeId == profileUserId
+                               select new
+                               {
+                                   user.Id,
+                                   user.UserName,
+                                   user.Description
+                               }).ToListAsync();
+            return users;
         }
 
         // PUT: api/applicationusers/follow
