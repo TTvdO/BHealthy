@@ -22,7 +22,8 @@ steps:
       SonarQube: "SonarQube_Group4"
       projectKey: "group-4"
       projectName: "Group 4"
-
+      extraProperties: |
+        sonar.tests=HealthSocialMediaApp/HealthSocialMediaUnitTests/**
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
