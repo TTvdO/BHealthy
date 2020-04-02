@@ -68,7 +68,7 @@ namespace HealthSocialMediaApp.Controllers
             }
 
             // Example of a fileUrl: "../images/example.jpg"
-            var fileUrl = Path.Combine("..", imagesFolder, fileName);
+            var fileUrl = "../" + imagesFolder + "/" + fileName;
 
             return fileUrl;
         }
