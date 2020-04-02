@@ -15,12 +15,12 @@ function useRestApi(initialUrl, initialData) {
 			.then(response => {
 				return response.json();
 			})
-			.then(data => {
-				setData(data);
+			.then(dataRes => {
+				setData(dataRes);
 				setIsLoading(false);
 			})
-			.catch(error => {
-				setError(error);
+			.catch(errorMsg => {
+				setError(errorMsg);
 				setIsLoading(false);
 			});
 	}, [initialUrl]);

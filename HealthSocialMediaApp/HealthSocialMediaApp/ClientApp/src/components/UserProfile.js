@@ -50,9 +50,9 @@ const UserProfile = () => {
 
 	useEffect(() => {
 		authService.getAccessToken().then(token => {
-			authService.getUser().then(user => {
+			authService.getUser().then(userProf => {
 				fetch(
-					`/api/applicationusers/follow?currentUserId=${user.sub}&profileUserId=${userId}`,
+					`/api/applicationusers/follow?currentUserId=${userProf.sub}&profileUserId=${userId}`,
 					{
 						headers: getAuthorizationHeaders(token)
 					}

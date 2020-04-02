@@ -1,5 +1,4 @@
 import React from "react";
-import { Component } from "react";
 import { Route, Redirect } from "react-router-dom";
 import {
 	ApplicationPaths,
@@ -7,7 +6,7 @@ import {
 } from "./ApiAuthorizationConstants";
 import authService from "./AuthorizeService";
 
-export default class AuthorizeRoute extends Component {
+export default class AuthorizeRoute extends React.Component {
 	constructor(props) {
 		super(props);
 

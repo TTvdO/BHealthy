@@ -169,10 +169,5 @@ namespace HealthSocialMediaApp.Controllers
 
             return post;
         }
-
-        private bool PostExists(int id)
-        {
-            return _context.Posts.Any(p => p.Id == id);
-        }
     }
 }

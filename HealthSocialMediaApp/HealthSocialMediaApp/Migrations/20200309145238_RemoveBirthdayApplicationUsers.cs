@@ -6,12 +6,12 @@ namespace HealthSocialMediaApp.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+            //Needed for migrations
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            //Needed for migrations
         }
     }
 }

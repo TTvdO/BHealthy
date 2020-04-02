@@ -28,8 +28,8 @@ function usePostData(currentUserId, userId, following) {
 				headers: getAuthorizationHeaders(token)
 			});
 			fetchPosts();
-		} catch (error) {
-			console.error("Could not delete posts. Error message: ", error);
+		} catch (errMsg) {
+			console.error("Could not delete posts. Error message: ", errMsg);
 		}
 	};
 
