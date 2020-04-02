@@ -23,7 +23,10 @@ steps:
       projectKey: "group-4"
       projectName: "Group 4"
       extraProperties: |
-        sonar.tests=HealthSocialMediaApp/HealthSocialMediaUnitTests/**
+        sonar.tests="HealthSocialMediaApp/HealthSocialMediaUnitTests/**"
+        sonar.exclusions="**/Migrations/**"
+        sonar.coverage.exclusions="**/Migrations/**"
+
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:

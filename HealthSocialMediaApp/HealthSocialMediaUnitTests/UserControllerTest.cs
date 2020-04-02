@@ -1,13 +1,10 @@
 ﻿using Xunit;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
-using System;
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using IdentityServer4.EntityFramework.Options;
 using HealthSocialMediaApp.Controllers;
-using Microsoft.AspNetCore.Routing;
 
 namespace HealthSocialMediaUnitTest
 {

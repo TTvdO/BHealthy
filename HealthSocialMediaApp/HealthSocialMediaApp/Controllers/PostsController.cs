@@ -29,10 +29,10 @@ namespace HealthSocialMediaApp.Controllers
         public async Task<ActionResult<System.Collections.IEnumerable>> GetPosts(string currentUserId, string userId, bool? following)
         {
             var post = await (from p in _context.Posts
-                              let likeCount = (from like in _context.Likes where like.PostId == p.Id select like.Id).Count()
-                              let likedByUser = currentUserId != null ? (from like in _context.Likes where like.PostId == p.Id && like.ApplicationUserId == currentUserId select like.Id).Any() : false
-                              where (userId != null ? p.ApplicationUser.Id == userId : true)
-                              where (following != null ? _context.Followers.Where(d => d.FollowerId == currentUserId).Select(r => r.FolloweeId).Contains(p.ApplicationUserId) : true)
+                              let amountOfLikes = (from like in _context.Likes where like.PostId == p.Id select like.Id).Count()
+                              let isLikedByCurrentUser = currentUserId != null && (from like in _context.Likes where like.PostId == p.Id && like.ApplicationUserId == currentUserId select like.Id).Any()
+                              where (userId != null && p.ApplicationUser.Id == userId) || (userId == null)
+                              where (following != null && _context.Followers.Where(d => d.FollowerId == currentUserId).Select(r => r.FolloweeId).Contains(p.ApplicationUserId)) || (following == null)
                               select new
                               {
                                   p.Id,
@@ -43,8 +43,8 @@ namespace HealthSocialMediaApp.Controllers
                                   p.CreatedAt,
                                   p.ApplicationUser.UserName,
                                   UserId = p.ApplicationUserId,
-                                  amountOfLikes = likeCount,
-                                  isLikedByCurrentUser = likedByUser
+                                  amountOfLikes,
+                                  isLikedByCurrentUser
                               }).OrderByDescending(d => d.CreatedAt).ToListAsync();
             return post;
         }

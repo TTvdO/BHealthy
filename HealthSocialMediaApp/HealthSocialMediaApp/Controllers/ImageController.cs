@@ -38,7 +38,7 @@ namespace HealthSocialMediaApp.Controllers
                      fileName,
                      _hostingEnv);
 
-                if (filePath == "null")
+                if (filePath == null)
                 {
                     return ErrorResult("Image is null");
                 }
@@ -53,28 +53,24 @@ namespace HealthSocialMediaApp.Controllers
             string imageName,
             IWebHostEnvironment hostingEnv)
         {
-
-            if (file != null)
+            if (file == null)
             {
-                // Upload files to wwwroot
-                var fileName = imageName += GetExtention(file);
-                var filePath = Path.Combine(hostingEnv.WebRootPath, imagesFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                // Get the url to the image
-                // Example of a URL: "../images/example.jpg"
-                var fileUrl = "../" + imagesFolder + "/" + fileName;
-
-                return fileUrl;
+                return null;
             }
-            else
+
+            // Store files in wwwroot
+            var fileName = imageName += GetExtention(file);
+            var filePath = Path.Combine(hostingEnv.WebRootPath, imagesFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                return "null";
+                await file.CopyToAsync(stream);
             }
+
+            // Example of a fileUrl: "../images/example.jpg"
+            var fileUrl = Path.Combine("..", imagesFolder, fileName);
+
+            return fileUrl;
         }
 
         public static void DeleteImage(string imageLink, IWebHostEnvironment hostingEnv)
@@ -93,12 +89,10 @@ namespace HealthSocialMediaApp.Controllers
                     System.IO.File.Delete(filePath);
                 }
             }
-
         }
 
         public static JsonResult ErrorResult(string message)
         {
-
             return new JsonResult(imagesError + message);
         }
 
