@@ -13,6 +13,7 @@ variables:
   Parameters.TestProjects: "**/*[Tt]ests/*.csproj"
 
 steps:
+  # Prepare SonarQube
   - task: SonarQubePrepare@4
     displayName: "Prepare SonarQube analysis"
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
@@ -21,33 +22,60 @@ steps:
       projectKey: "group-4"
       projectName: "Group 4"
 
+  # Install Node.js
+  - task: NodeTool@0
+    inputs:
+      workingDir: ./HealthSocialMediaApp/HealthSocialMediaApp/ClientApp
+      versionSpec: "12.16.1"
+    displayName: "Install Node.js"
+
+  # Install node modules.
+  - script: |
+      npm install
+    workingDirectory: ./HealthSocialMediaApp/HealthSocialMediaApp/ClientApp
+    displayName: "NPM Install"
+
+  # Run ESLint
+  - task: Npm@1
+    inputs:
+      workingDir: ./HealthSocialMediaApp/HealthSocialMediaApp/ClientApp
+      command: custom
+      customCommand: "run lint"
+    displayName: Run ESLint
+
+  # Restore packages
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
       command: restore
       projects: "$(Parameters.RestoreBuildProjects)"
 
+  # Build
   - task: DotNetCoreCLI@2
     displayName: Build
     inputs:
       projects: "$(Parameters.RestoreBuildProjects)"
       arguments: "--configuration $(BuildConfiguration)"
 
+  # Test
   - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
       command: test
       projects: "$(Parameters.TestProjects)"
-      arguments: "--configuration $(BuildConfiguration) --collect \"Code coverage\""
+      arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
 
+  # Analyze
   - task: SonarQubeAnalyze@4
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: "Run Code Analysis"
 
+  # Publish analyze results
   - task: SonarQubePublish@4
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     displayName: "Publish Quality Gate Result"
 
+  # Publish application
   - task: DotNetCoreCLI@2
     displayName: Publish
     inputs:
@@ -56,12 +84,14 @@ steps:
       arguments: "--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)"
       zipAfterPublish: True
 
+  # Publish artifact: Application
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: Application Build"
     inputs:
       PathtoPublish: "$(Build.ArtifactStagingDirectory)"
     condition: succeededOrFailed()
 
+  # Publish artifact: ARM template and parameters
   - task: PublishBuildArtifacts@1
     displayName: "Publish Artifact: ARM"
     inputs:

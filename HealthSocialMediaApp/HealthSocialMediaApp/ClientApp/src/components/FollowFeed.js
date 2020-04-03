@@ -22,11 +22,11 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const FollowFeed = (props) => {
-    const classes = useStyles();
+const FollowFeed = props => {
+	const classes = useStyles();
 
-    return (
-        <div className={classes.root}>
+	return (
+		<div className={classes.root}>
 			<Grid container spacing={1}>
 				{props.listOfUsers.length === 0 && <h2>No users found</h2>}
 				{props.listOfUsers.map(user => (
@@ -50,7 +50,7 @@ const FollowFeed = (props) => {
 				))}
 			</Grid>
 		</div>
-    )
-}
+	);
+};
 
 export { FollowFeed };

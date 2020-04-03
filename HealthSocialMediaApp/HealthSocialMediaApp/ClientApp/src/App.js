@@ -21,8 +21,8 @@ function App() {
 			<Route path="/account" component={ApplicationUser} />
 			<Route path="/search" component={Search} />
 			<Route path="/user/:userId" component={UserProfile} />
-            <Route path="/follows/:userId/" component={UserFollowing}/>
-            <Route path="/followers/:userId/" component={UserFollowers}/>
+			<Route path="/follows/:userId/" component={UserFollowing} />
+			<Route path="/followers/:userId/" component={UserFollowers} />
 			<Route
 				path={ApplicationPaths.ApiAuthorizationPrefix}
 				component={ApiAuthorizationRoutes}

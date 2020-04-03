@@ -41,7 +41,7 @@
 		"start": "rimraf ./build && react-scripts start",
 		"build": "react-scripts build",
 		"test": "cross-env CI=true react-scripts test --env=jsdom",
-		"lint": "eslint ./src/"
+		"lint": "./node_modules/.bin/eslint ./src/"
 	},
 	"browserslist": {
 		"production": [

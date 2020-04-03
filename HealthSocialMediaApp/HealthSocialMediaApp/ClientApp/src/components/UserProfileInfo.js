@@ -1,10 +1,7 @@
 import React from "react";
-
 import { Typography, Grid, Avatar, Button, Box } from "@material-ui/core";
-
 import { makeStyles } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
-
 import { Link as RouterLink } from "react-router-dom";
 import { Link } from "@material-ui/core";
 
@@ -67,25 +64,27 @@ const UserProfileInfo = ({
 									to={`/follows/${user.id}`}
 									key={user.id}
 								>
-                                    <Typography variant="h6">Follows</Typography>
-									
+									<Typography variant="h6">
+										Follows
+									</Typography>
 								</Link>
 							</Typography>
 							<Typography>{user.followees.length}</Typography>
 						</Box>
 						<Box className={classes.profileInfoItem}>
-                        <Box className={classes.profileInfoItem}>
-							<Typography>
-								<Link
-									component={RouterLink}
-									to={`/followers/${user.id}`}
-									key={user.id}
-								>
-                                    <Typography variant="h6">Followers</Typography>
-									
-								</Link>
-							</Typography>
-						</Box>
+							<Box className={classes.profileInfoItem}>
+								<Typography>
+									<Link
+										component={RouterLink}
+										to={`/followers/${user.id}`}
+										key={user.id}
+									>
+										<Typography variant="h6">
+											Followers
+										</Typography>
+									</Link>
+								</Typography>
+							</Box>
 							<Typography>{user.followers.length}</Typography>
 						</Box>
 					</Box>
