@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -9,8 +9,12 @@
         <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
         <UserSecretsId>5fa068fd-245b-4e1e-8b9a-8ca7459491ca</UserSecretsId>
         <ProjectGuid>{478357df-e8bf-4a1a-98ee-add5be779519}</ProjectGuid>
+        <ApplicationInsightsResourceId>/subscriptions/4c75ca77-8e89-4a91-9cc0-9bc76d3a6693/resourcegroups/rg-se-vt-s6-gr4/providers/microsoft.insights/components/bhealthy-insights</ApplicationInsightsResourceId>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Microsoft.ApplicationInsights" Version="2.13.1" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />
+        <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.13.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.2" />
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.2" />
         <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.2" />
@@ -39,6 +43,9 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+    <ItemGroup>
+      <WCFMetadata Include="Connected Services" />
+    </ItemGroup>
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
         <Exec Command="node --version" ContinueOnError="true">
@@ -55,7 +62,7 @@
         <!-- Include the newly-built files in the publish output -->
         <ItemGroup>
             <DistFiles Include="$(SpaRoot)build\**" />
-            <ResolvedFileToPublish Include="@(DistFiles-&gt;'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+            <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
                 <RelativePath>%(DistFiles.Identity)</RelativePath>
                 <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
                 <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
