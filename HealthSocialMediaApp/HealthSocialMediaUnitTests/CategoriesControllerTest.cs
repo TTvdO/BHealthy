@@ -33,7 +33,7 @@ namespace HealthSocialMediaUnitTest
         }
 
         [Fact]
-        public async void DeletePost()
+        public async void GetCategories()
         {
             ApplicationDbContext _context = CreateContextTests("tesDb6");
             CategoriesController c = new CategoriesController(_context);
