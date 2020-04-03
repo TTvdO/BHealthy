@@ -1,8 +1,6 @@
 trigger:
   - master
 
-name: BHealthy.CI
-
 pool:
   name: Azure Pipelines
   vmImage: windows-2019
@@ -22,10 +20,6 @@ steps:
       SonarQube: "SonarQube_Group4"
       projectKey: "group-4"
       projectName: "Group 4"
-      extraProperties: |
-        sonar.tests="HealthSocialMediaApp/HealthSocialMediaUnitTests/**"
-        sonar.exclusions="**/Migrations/**"
-        sonar.coverage.exclusions="**/Migrations/**"
 
   - task: DotNetCoreCLI@2
     displayName: Restore
@@ -44,7 +38,7 @@ steps:
     inputs:
       command: test
       projects: "$(Parameters.TestProjects)"
-      arguments: "--configuration $(BuildConfiguration)"
+      arguments: "--configuration $(BuildConfiguration) --collect \"Code coverage\""
 
   - task: SonarQubeAnalyze@4
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
