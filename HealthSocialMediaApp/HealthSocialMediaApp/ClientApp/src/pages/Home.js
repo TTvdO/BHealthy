@@ -2,10 +2,11 @@ import React from "react";
 
 import { Container, Typography } from "@material-ui/core";
 
-import { PostCreate } from "./PostCreate";
-import { Posts } from "./Posts";
-import { usePostData } from "./data-hooks/usePostData";
-import { useCurrentUserId } from "./data-hooks/useCurrentUserId";
+import { PostCreate } from "../components/PostCreate";
+import { Posts } from "../components/Posts";
+
+import { usePostData } from "../hooks/usePostData";
+import { useCurrentUserId } from "../hooks/useCurrentUserId";
 
 const Home = () => {
 	const currentUserId = useCurrentUserId();

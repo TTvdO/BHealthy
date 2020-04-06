@@ -12,30 +12,32 @@ namespace HealthSocialMediaApp.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ApplicationUsersController
+    public class UsersController
      : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public ApplicationUsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/applicationusers/a0e61ab9-ef88-470e-b0f0-9e06b1542c4f
+        // GET: api/users/a0e61ab9-ef88-470e-b0f0-9e06b1542c4f
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetUser(string id)
         {
             var user = await (from u in _context.Users
                               where u.Id == id
+                              let followees = (from f in u.Followees select f.FolloweeId)
+                              let followers = (from f in u.Followers select f.FollowerId)
                               select new
                               {
                                   u.Id,
                                   u.UserName,
                                   u.Description,
                                   u.Email,
-                                  u.Followees,
-                                  u.Followers
+                                  followers,
+                                  followees
                               }
             ).FirstOrDefaultAsync();
 
@@ -47,26 +49,26 @@ namespace HealthSocialMediaApp.Controllers
             return user;
         }
 
-        // PUT: api/applicationusers
+        // PUT: api/users
         [HttpPut]
-        public async Task<IActionResult> PutApplicationUser([FromBody] ApplicationUser editedApplicationUser)
+        public async Task<IActionResult> PutApplicationUser([FromBody] ApplicationUser editedUser)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == editedApplicationUser.Id);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == editedUser.Id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            user.UserName = editedApplicationUser.UserName;
-            user.Description = editedApplicationUser.Description;
+            user.UserName = editedUser.UserName;
+            user.Description = editedUser.Description;
 
             await _context.SaveChangesAsync();
 
             return StatusCode(200);
         }
 
-        // GET: api/applicationusers/follows/id
+        // GET: api/users/follows/id
         [HttpGet("follows")]
         public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollows(string profileUserId, string currentUserId)
         {
@@ -82,7 +84,7 @@ namespace HealthSocialMediaApp.Controllers
             return users;
         }
 
-        // GET: api/applicationusers/follows/id
+        // GET: api/users/follows/id
         [HttpGet("followers")]
         public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollowers(string profileUserId, string currentUserId)
         {
@@ -98,21 +100,18 @@ namespace HealthSocialMediaApp.Controllers
             return users;
         }
 
-        // PUT: api/applicationusers/follow
-        [Authorize]
+        // PUT: api/users/follow
         [HttpPut("follow")]
-        public async Task<IActionResult> PutFollow(string userId, string followUserName)
+        public async Task<IActionResult> PutFollow(string followerid, string followeeId)
         {
-            string followeeId = _context.Users.Where(o => o.UserName == followUserName).FirstOrDefault().Id;
-
-            if (followeeId == userId)
+            if (followeeId == followerid)
             {
                 return BadRequest();
             }
 
             var follow = new FollowerFollowee
             {
-                FollowerId = userId,
+                FollowerId = followerid,
                 FolloweeId = followeeId
             };
 
@@ -124,7 +123,7 @@ namespace HealthSocialMediaApp.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ApplicationUserExists(userId))
+                if (!UserExists(followerid))
                 {
                     return NotFound();
                 }
@@ -137,13 +136,12 @@ namespace HealthSocialMediaApp.Controllers
             return NoContent();
         }
 
-        // PUT: api/applicationusers/unfollow
-        [Authorize]
+        // PUT: api/users/unfollow
         [HttpPut("unfollow")]
-        public async Task<IActionResult> PutUnFollow(string userId, string followUserName)
+        public async Task<IActionResult> PutUnFollow(string followerId, string followeeId)
         {
-            string followId = _context.Users.Where(o => o.UserName == followUserName).FirstOrDefault().Id;
-            FollowerFollowee follow = _context.Followers.Where(o => o.FollowerId == userId && o.FolloweeId == followId).FirstOrDefault();
+            FollowerFollowee follow = _context.Followers.Where(o => o.FollowerId == followerId && o.FolloweeId == followeeId).FirstOrDefault();
+
             if (follow == null)
             {
                 return BadRequest();
@@ -157,7 +155,7 @@ namespace HealthSocialMediaApp.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ApplicationUserExists(userId))
+                if (!UserExists(followerId))
                 {
                     return NotFound();
                 }
@@ -170,7 +168,7 @@ namespace HealthSocialMediaApp.Controllers
             return StatusCode(200);
         }
 
-        private bool ApplicationUserExists(string id)
+        private bool UserExists(string id)
         {
             return _context.Users.Any(a => a.Id == id);
         }

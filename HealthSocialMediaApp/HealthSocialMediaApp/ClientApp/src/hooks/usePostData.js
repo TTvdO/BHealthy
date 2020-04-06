@@ -1,14 +1,5 @@
-import authService from "../api-authorization/AuthorizeService";
-
 import { useRestApi } from "./useRestApi";
-
-const getAuthorizationHeaders = token => {
-	return token
-		? {
-				Authorization: `Bearer ${token}`
-		  }
-		: {};
-};
+import { fetchWithAuth } from "./useRestApiWithAuth";
 
 function usePostData(currentUserId, userId, following) {
 	let url = `/api/posts?currentUserId=${currentUserId}`;
@@ -21,11 +12,9 @@ function usePostData(currentUserId, userId, following) {
 	const [{ data: posts, isLoading, error }, fetchPosts] = useRestApi(url, []);
 
 	const handleDelete = async id => {
-		const token = await authService.getAccessToken();
 		try {
-			await fetch(`/api/posts/${id}`, {
-				method: "DELETE",
-				headers: getAuthorizationHeaders(token)
+			await fetchWithAuth(`/api/posts/${id}`, {
+				method: "DELETE"
 			});
 			fetchPosts();
 		} catch (errMsg) {
@@ -34,24 +23,22 @@ function usePostData(currentUserId, userId, following) {
 	};
 
 	const handleLikeToggle = async post => {
-		const token = await authService.getAccessToken();
-		const authorizationHeaders = getAuthorizationHeaders(token);
-
 		if (!post.isLikedByCurrentUser) {
-			await fetch(`/api/posts/${post.id}/like?userId=${currentUserId}`, {
-				method: "PUT",
-				headers: authorizationHeaders
-			});
+			await fetchWithAuth(
+				`/api/posts/${post.id}/like?userId=${currentUserId}`,
+				{
+					method: "PUT"
+				}
+			);
 		} else {
-			await fetch(
+			await fetchWithAuth(
 				`/api/posts/${post.id}/unlike?userId=${currentUserId}`,
 				{
-					method: "PUT",
-					headers: authorizationHeaders
+					method: "PUT"
 				}
 			);
 		}
-		fetchPosts();
+		await fetchPosts();
 	};
 
 	return [

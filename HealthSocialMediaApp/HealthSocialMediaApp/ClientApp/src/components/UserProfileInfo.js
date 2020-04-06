@@ -1,9 +1,9 @@
 import React from "react";
-import { Typography, Grid, Avatar, Button, Box } from "@material-ui/core";
+import { Link as RouterLink } from "react-router-dom";
+
+import { Typography, Grid, Avatar, Button, Box, Link } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
-import { Link as RouterLink } from "react-router-dom";
-import { Link } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
 	media: {
@@ -108,6 +108,9 @@ const UserProfileInfo = ({
 							Follow
 						</Button>
 					)}
+				</Grid>
+				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+					<Typography variant="body1">{user.description}</Typography>
 				</Grid>
 			</Grid>
 		</>

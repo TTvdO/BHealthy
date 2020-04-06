@@ -1,10 +1,8 @@
 import React from "react";
-import Grid from "@material-ui/core/Grid";
 import { Link as RouterLink } from "react-router-dom";
-import { Link } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
+
+import { Avatar, Link, Paper, Grid, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { Avatar } from "@material-ui/core";
 import { blue } from "@material-ui/core/colors";
 
 const useStyles = makeStyles(theme => ({
@@ -22,26 +20,22 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const FollowFeed = props => {
+const UsersList = ({ users }) => {
 	const classes = useStyles();
 
 	return (
 		<div className={classes.root}>
 			<Grid container spacing={1}>
-				{props.listOfUsers.length === 0 && <h2>No users found</h2>}
-				{props.listOfUsers.map(user => (
-					<Grid item xs={12}>
+				{users.length === 0 && <Typography>No users found</Typography>}
+				{users.map(user => (
+					<Grid item xs={12} key={user.id}>
 						<Paper className={classes.paper}>
-							<Avatar
-								aria-label="recipe"
-								className={classes.avatar}
-							>
+							<Avatar className={classes.avatar}>
 								{user.userName[0] + user.userName[1]}
 							</Avatar>
 							<Link
 								component={RouterLink}
 								to={`/user/${user.id}`}
-								key={user.id}
 							>
 								{user.userName}
 							</Link>
@@ -53,4 +47,4 @@ const FollowFeed = props => {
 	);
 };
 
-export { FollowFeed };
+export { UsersList };

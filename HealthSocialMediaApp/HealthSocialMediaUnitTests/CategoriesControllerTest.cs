@@ -5,10 +5,8 @@ using IdentityServer4.EntityFramework.Options;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace HealthSocialMediaUnitTest

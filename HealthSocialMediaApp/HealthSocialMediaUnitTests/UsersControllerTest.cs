@@ -49,7 +49,7 @@ namespace HealthSocialMediaUnitTest
             #endregion
 
             // Act
-            ApplicationUsersController usersController = new ApplicationUsersController(context);
+            UsersController usersController = new UsersController(context);
             var result = await usersController.PutApplicationUser(updatedUser);
 
             // Assert
@@ -71,16 +71,16 @@ namespace HealthSocialMediaUnitTest
 
             #region data preperation
 
-            ApplicationUser user1 = PutOneUserInDb(context, "first","john");
-            ApplicationUser user2 = PutOneUserInDb(context, "second","oh Hi mark");
+            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
+            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
             #endregion
 
             //Act
-            ApplicationUsersController usersController = new ApplicationUsersController(context);
-            await usersController.PutFollow(user1.Id, user2.UserName);
+            UsersController usersController = new UsersController(context);
+            await usersController.PutFollow(user1.Id, user2.Id);
 
             //Assert
-            Assert.True(context.Followers.Any(f=>f.FollowerId ==user1.Id && f.FolloweeId == user2.Id));
+            Assert.True(context.Followers.Any(f => f.FollowerId == user1.Id && f.FolloweeId == user2.Id));
 
         }
 
@@ -101,17 +101,18 @@ namespace HealthSocialMediaUnitTest
             #endregion
 
             //Act
-            ApplicationUsersController usersController = new ApplicationUsersController(context);
-            await usersController.PutUnFollow(user1.Id, user2.UserName);
+            UsersController usersController = new UsersController(context);
+            await usersController.PutUnFollow(user1.Id, user2.Id);
 
             //Assert
             Assert.False(context.Followers.Any(f => f.FollowerId == user1.Id && f.FolloweeId == user2.Id));
         }
 
         private ApplicationUser PutOneUserInDb(
-            ApplicationDbContext _context, 
-            string userId ="one-two-three",
-            string userName = "Jimmy") {
+            ApplicationDbContext _context,
+            string userId = "one-two-three",
+            string userName = "Jimmy")
+        {
 
             var user = new ApplicationUser
             {

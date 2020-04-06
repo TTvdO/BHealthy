@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import "typeface-roboto";
 import clsx from "clsx";
+
 import { makeStyles } from "@material-ui/core/styles";
 
 import MenuIcon from "@material-ui/icons/Menu";
@@ -21,7 +22,7 @@ import {
 } from "@material-ui/core";
 
 import { LoginMenu } from "./api-authorization/LoginMenu";
-import { useCurrentUserId } from "./data-hooks/useCurrentUserId";
+import { useCurrentUserId } from "../hooks/useCurrentUserId";
 
 const useStyles = makeStyles(theme => ({
 	outerContainer: {
@@ -60,7 +61,7 @@ const Layout = ({ children }) => {
 	const currentUserId = useCurrentUserId();
 
 	// Menu Drawer
-	const [state, setState] = useState({
+	const [menuState, setMenuState] = useState({
 		left: false
 	});
 
@@ -73,7 +74,7 @@ const Layout = ({ children }) => {
 			return;
 		}
 
-		setState({ ...state, [anchor]: open });
+		setMenuState({ ...menuState, [anchor]: open });
 	};
 
 	const list = anchor => (
@@ -174,7 +175,7 @@ const Layout = ({ children }) => {
 								</IconButton>
 								<SwipeableDrawer
 									anchor={anchor}
-									open={state[anchor]}
+									open={menuState[anchor]}
 									onClose={toggleDrawer(anchor, false)}
 									onOpen={toggleDrawer(anchor, true)}
 								>

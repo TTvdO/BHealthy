@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import authService from "../api-authorization/AuthorizeService";
+import authService from "../components/api-authorization/AuthorizeService";
 
 function useCurrentUserId() {
 	const [currentUserId, setCurrentUserId] = useState(null);

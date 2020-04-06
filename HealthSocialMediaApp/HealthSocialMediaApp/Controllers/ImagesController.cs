@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 
+
 namespace HealthSocialMediaApp.Controllers
 {
     [Route("api/[controller]")]
@@ -26,6 +27,11 @@ namespace HealthSocialMediaApp.Controllers
         [HttpPost]
         public async Task<ActionResult> Upload(IFormFile file)
         {
+            if (!FeatureFlags.IsEnabled(FeatureFlags.ImageUpload, _hostingEnv))
+            {
+                return NotFound();
+            }
+
             if (!ImagesController.IsImage(file))
             {
                 return ErrorResult("The file should be an image");
