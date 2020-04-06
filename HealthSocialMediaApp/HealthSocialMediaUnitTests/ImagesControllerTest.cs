@@ -49,7 +49,7 @@ namespace HealthSocialMediaUnitTest
         }
 
         [Fact]
-        public void GetCorrectExention()
+        public void GetCorrectExtention()
         {
             IFormFile textFile = new FormFile(
                 new MemoryStream(Encoding.UTF8.GetBytes("This is a dummy file")),

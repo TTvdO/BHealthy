@@ -1,9 +1,5 @@
 using Xunit;
 using HealthSocialMediaApp.Models;
-using HealthSocialMediaApp.Data;
-using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using IdentityServer4.EntityFramework.Options;
 using HealthSocialMediaApp.Controllers;
 using Microsoft.AspNetCore.Routing;
 
@@ -17,17 +13,8 @@ namespace HealthSocialMediaUnitTest
             //Arrange
             #region context preperation
 
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestDB")
-                .Options;
+            var context = DbContextCreator.CreateTestContext("SearchTestDB");
 
-            var operationalStoreOptions = Options.Create(
-                new OperationalStoreOptions
-                {
-                    DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
-                    PersistedGrants = new TableConfiguration("PersistedGrants")
-                });
-            var context = new ApplicationDbContext(options, operationalStoreOptions);
             #endregion
 
             #region data preparation

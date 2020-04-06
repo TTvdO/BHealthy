@@ -1,9 +1,7 @@
 ﻿using Xunit;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
-using IdentityServer4.EntityFramework.Options;
 using HealthSocialMediaApp.Controllers;
 using System.Linq;
 
@@ -11,28 +9,12 @@ namespace HealthSocialMediaUnitTest
 {
     public class UserControllerTest
     {
-        private ApplicationDbContext SetUpDbContext(string name)
-        {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: name)
-                .Options;
-
-            var operationalStoreOptions = Options.Create(
-                new OperationalStoreOptions
-                {
-                    DeviceFlowCodes = new TableConfiguration("DeviceCodes"),
-                    PersistedGrants = new TableConfiguration("PersistedGrants")
-                });
-
-            return new ApplicationDbContext(options, operationalStoreOptions);
-        }
-
         [Fact]
         public async void UserIsUpdated()
         {
             // Arrange
             #region context preperation
-            var context = SetUpDbContext("testDb1");
+            var context = DbContextCreator.CreateTestContext("UsersTestDbUserIsUpdated");
             #endregion
 
             #region data preperation
@@ -66,7 +48,7 @@ namespace HealthSocialMediaUnitTest
         {
             // Arrange
             #region context preperation
-            var context = SetUpDbContext("testDb3");
+            var context = DbContextCreator.CreateTestContext("UsersTestDbPutFollow");
             #endregion
 
             #region data preperation
@@ -89,7 +71,7 @@ namespace HealthSocialMediaUnitTest
         {
             // Arrange
             #region context preperation
-            var context = SetUpDbContext("testDb4");
+            var context = DbContextCreator.CreateTestContext("UsersTestDbPutUnfollow");
             #endregion
 
             #region data preperation
