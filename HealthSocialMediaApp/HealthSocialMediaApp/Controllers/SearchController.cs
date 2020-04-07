@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using HealthSocialMediaApp.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 
 namespace HealthSocialMediaApp.Controllers
 {
@@ -19,10 +18,10 @@ namespace HealthSocialMediaApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<System.Collections.IEnumerable>> GetSearchedUsers(string searchInput)
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetSearchedUsers(string searchQuery)
         {
             var usersMatchingInput = await (from user in _context.Users
-                                            where (user.UserName.ToLower().Trim().Contains(searchInput.ToLower().Trim()))
+                                            where (searchQuery != null && user.UserName.ToLower().Trim().Contains(searchQuery.ToLower().Trim()))
                                             select new
                                             {
                                                 user.Id,

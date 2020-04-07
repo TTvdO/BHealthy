@@ -39,7 +39,7 @@ const Search = () => {
 	const [query, setQuery] = useState("");
 
 	const [{ data: users, isLoading }] = useRestApiWithAuth(
-		`/api/search?searchInput=${query}`,
+		`/api/search?searchQuery=${query}`,
 		[]
 	);
 

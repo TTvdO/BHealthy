@@ -1,6 +1,7 @@
 using Xunit;
 using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Controllers;
+using HealthSocialMediaApp.Data;
 using Microsoft.AspNetCore.Routing;
 
 namespace HealthSocialMediaUnitTest
@@ -8,7 +9,7 @@ namespace HealthSocialMediaUnitTest
     public class SearchControllerTest
     {
         [Fact]
-        public void SearchUserTest()
+        async public void UsersCanBeSearched()
         {
             //Arrange
             #region context preperation
@@ -19,43 +20,43 @@ namespace HealthSocialMediaUnitTest
 
             #region data preparation
 
-            var appUserOne = new ApplicationUser
+            var userOne = new ApplicationUser
             {
                 Email = "SpecificUserName@mail.com",
                 UserName = "SpecificUsername01",
                 Description = "Bodybuilding guy",
                 Id = "specificusername-id"
             };
-            context.Users.Add(appUserOne);
+            context.Users.Add(userOne);
 
-            var appUserTwo = new ApplicationUser
+            var userTwo = new ApplicationUser
             {
                 Email = "VerySpecificUsername@mail.com",
                 UserName = "VerySpecificUsername999",
                 Description = "The best fitness account",
                 Id = "veryspecificusername-id"
             };
-            context.Users.Add(appUserTwo);
+            context.Users.Add(userTwo);
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             #endregion
 
             //Act
             SearchController searchController = new SearchController(context);
 
-            string searchPhraseOne = "VerySpecificUsername999";
-            string searchPhraseTwo = "specificusername0 ";
+            string searchQueryOne = "VerySpecificUsername999";
+            string searchQueryTwo = "specificusername0 ";
 
-            var resultOne = searchController.GetSearchedUsers(searchPhraseOne);
-            var resultTwo = searchController.GetSearchedUsers(searchPhraseTwo);
+            var resultOne = searchController.GetSearchedUsers(searchQueryOne);
+            var resultTwo = searchController.GetSearchedUsers(searchQueryTwo);
 
-            bool[] arrayOne = SearchUserLoop(searchPhraseOne, resultOne);
+            bool[] arrayOne = SearchUserLoop(searchQueryOne, resultOne);
 
             bool onlyOneUserInFirstResult = arrayOne[0];
             bool specificUserInFirstResult = arrayOne[1];
 
-            bool[] arrayTwo = SearchUserLoop(searchPhraseTwo, resultTwo);
+            bool[] arrayTwo = SearchUserLoop(searchQueryTwo, resultTwo);
 
             bool onlyOneUserInSecondResult = arrayTwo[0];
             bool specificUserInSecondResult = arrayTwo[1];
@@ -88,7 +89,6 @@ namespace HealthSocialMediaUnitTest
                 {
                     specificUserFound = true;
                 }
-
             }
 
             bool[] arr = new bool[2];
@@ -98,5 +98,32 @@ namespace HealthSocialMediaUnitTest
             return arr;
         }
 
+        [Fact]
+        async public void EmptySearchPhrasesReturnNothing()
+        {
+            var context = DbContextCreator.CreateTestContext("SearchTestDBEmptySearchPhrasesAreHandled");
+
+            var user = new ApplicationUser
+            {
+                Email = "jimmy@mail.com",
+                UserName = "Jimmy",
+                Description = "I love fitness",
+                Id = "jimmy-id"
+            };
+            context.Add(user);
+            await context.SaveChangesAsync();
+
+            SearchController searchController = new SearchController(context);
+
+            var foundUsers = await searchController.GetSearchedUsers(null);
+
+            var hasNoResults = true;
+            foreach (var foundUser in foundUsers.Value)
+            {
+                hasNoResults = false;
+            }
+
+            Assert.True(hasNoResults);
+        }
     }
 }
