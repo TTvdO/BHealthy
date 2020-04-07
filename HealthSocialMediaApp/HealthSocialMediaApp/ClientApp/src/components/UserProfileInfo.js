@@ -5,6 +5,8 @@ import { Typography, Grid, Avatar, Button, Box, Link } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
 
+import { useCurrentUserId } from "../hooks/useCurrentUserId";
+
 const useStyles = makeStyles(theme => ({
 	media: {
 		width: "100%",
@@ -37,6 +39,8 @@ const UserProfileInfo = ({
 	isFollowingThisUser
 }) => {
 	const classes = useStyles();
+
+	const currentUserId = useCurrentUserId();
 
 	return (
 		<>
@@ -91,24 +95,28 @@ const UserProfileInfo = ({
 				</Grid>
 				<br />
 				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-					{!isOwnProfile && isFollowingThisUser && (
-						<Button
-							variant="contained"
-							color="secondary"
-							onClick={onUnfollow}
-						>
-							Unfollow
-						</Button>
-					)}
-					{!isOwnProfile && !isFollowingThisUser && (
-						<Button
-							variant="contained"
-							color="primary"
-							onClick={onFollow}
-						>
-							Follow
-						</Button>
-					)}
+					{currentUserId !== null &&
+						!isOwnProfile &&
+						isFollowingThisUser && (
+							<Button
+								variant="contained"
+								color="secondary"
+								onClick={onUnfollow}
+							>
+								Unfollow
+							</Button>
+						)}
+					{currentUserId !== null &&
+						!isOwnProfile &&
+						!isFollowingThisUser && (
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={onFollow}
+							>
+								Follow
+							</Button>
+						)}
 				</Grid>
 				<br />
 				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

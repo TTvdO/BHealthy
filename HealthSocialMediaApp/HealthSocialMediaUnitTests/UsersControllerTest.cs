@@ -110,7 +110,7 @@ namespace HealthSocialMediaUnitTest
 
             //Act
             UsersController usersController = new UsersController(context);
-            var users = await usersController.GetAllFollows(user1.Id,null);
+            var users = await usersController.GetAllFollows(user1.Id);
 
             //Assert
             List<string> listIds = new List<string>();
@@ -142,7 +142,7 @@ namespace HealthSocialMediaUnitTest
 
             //Act
             UsersController usersController = new UsersController(context);
-            var users = await usersController.GetAllFollowers(user2.Id,null);
+            var users = await usersController.GetAllFollowers(user2.Id);
 
             //Assert
             List<string> listIds = new List<string>();

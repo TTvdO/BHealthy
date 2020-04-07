@@ -3,6 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { blue } from "@material-ui/core/colors";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { useCurrentUserId } from "../hooks/useCurrentUserId";
 
 import {
 	Card,
@@ -42,6 +43,8 @@ const useStyles = makeStyles(() => ({
 const Posts = ({ posts, onDelete, onLikeToggle }) => {
 	const classes = useStyles();
 
+	const currentUserId = useCurrentUserId();
+
 	return posts.map(post => (
 		<Card className={classes.root} key={post.id}>
 			<CardHeader
@@ -75,26 +78,32 @@ const Posts = ({ posts, onDelete, onLikeToggle }) => {
 				</Typography>
 			</CardContent>
 			<CardActions disableSpacing>
-				<Like
-					isLiked={post.isLikedByCurrentUser}
-					onToggle={() => onLikeToggle(post)}
-				/>
-				<Typography>{post.amountOfLikes}</Typography>
-				<IconButton
-					className={classes.delete}
-					aria-label="delete"
-					onClick={() => {
-						if (
-							window.confirm(
-								"Are you sure you want to delete this post?"
-							)
-						) {
-							onDelete(post.id);
-						}
-					}}
-				>
-					<DeleteIcon />
-				</IconButton>
+				{currentUserId && (
+					<>
+						<Like
+							isLiked={post.isLikedByCurrentUser}
+							onToggle={() => onLikeToggle(post)}
+						/>
+						<Typography>{post.amountOfLikes}</Typography>
+					</>
+				)}
+				{currentUserId && currentUserId === post.userId && (
+					<IconButton
+						className={classes.delete}
+						aria-label="delete"
+						onClick={() => {
+							if (
+								window.confirm(
+									"Are you sure you want to delete this post?"
+								)
+							) {
+								onDelete(post.id);
+							}
+						}}
+					>
+						<DeleteIcon />
+					</IconButton>
+				)}
 			</CardActions>
 		</Card>
 	));

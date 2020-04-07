@@ -103,70 +103,84 @@ const PostCreate = ({ onCreate }) => {
 
 	return (
 		<>
-			<Typography variant="h4">Share what motivates you</Typography>
-			<form className={classes.root} noValidate autoComplete="off">
-				{imageUploadFlag && (
-					<>
-						<InputLabel htmlFor="file">Select an image</InputLabel>
-						<input
-							ref={fileInputRef}
-							label="Image"
-							type="file"
-							name="file"
-							accept="image/*"
-							onChange={e => {
-								setImageFile(e.target.files[0]);
-							}}
-						/>
-					</>
-				)}
-				{!imageUploadFlag && (
-					<>
-						<InputLabel>Provide a link to an image</InputLabel>
-						<TextField
-							label="Link to an image"
-							onChange={e => {
-								setImageLink(e.target.value);
-							}}
-						/>
-					</>
-				)}
-				<TextField
-					label="Description"
-					value={description}
-					multiline
-					onChange={e => {
-						setDescription(e.target.value);
-					}}
-				/>
-
-				<NativeSelect
-					value={selectedCategory}
-					onChange={e => {
-						setSelectedCategory(e.target.value);
-					}}
-					inputProps={{
-						name: "category",
-						id: "category-native-helper"
-					}}
-				>
-					{categories.map(category => (
-						<option value={category.id} key={category.id}>
-							{category.name}
-						</option>
-					))}
-				</NativeSelect>
-				<div>
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={createPost}
-						disabled={getIsSubmitDisabled()}
+			{currentUserId && (
+				<>
+					<Typography variant="h4">
+						Share what motivates you
+					</Typography>
+					<form
+						className={classes.root}
+						noValidate
+						autoComplete="off"
 					>
-						Create post
-					</Button>
-				</div>
-			</form>
+						{imageUploadFlag && (
+							<>
+								<InputLabel htmlFor="file">
+									Select an image
+								</InputLabel>
+								<input
+									ref={fileInputRef}
+									label="Image"
+									type="file"
+									name="file"
+									accept="image/*"
+									onChange={e => {
+										setImageFile(e.target.files[0]);
+									}}
+								/>
+							</>
+						)}
+						{!imageUploadFlag && (
+							<>
+								<InputLabel>
+									Provide a link to an image
+								</InputLabel>
+								<TextField
+									label="Link to an image"
+									onChange={e => {
+										setImageLink(e.target.value);
+									}}
+								/>
+							</>
+						)}
+						<TextField
+							label="Description"
+							value={description}
+							multiline
+							onChange={e => {
+								setDescription(e.target.value);
+							}}
+						/>
+
+						<NativeSelect
+							value={selectedCategory}
+							onChange={e => {
+								setSelectedCategory(e.target.value);
+							}}
+							inputProps={{
+								name: "category",
+								id: "category-native-helper"
+							}}
+						>
+							{categories.map(category => (
+								<option value={category.id} key={category.id}>
+									{category.name}
+								</option>
+							))}
+						</NativeSelect>
+						<div>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={createPost}
+								disabled={getIsSubmitDisabled()}
+							>
+								Create post
+							</Button>
+						</div>
+					</form>
+				</>
+			)}
 		</>
 	);
 };

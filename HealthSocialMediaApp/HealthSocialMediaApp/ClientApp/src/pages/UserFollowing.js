@@ -9,10 +9,8 @@ import { UsersList } from "../components/UsersList";
 const UserFollowing = () => {
 	let { userId } = useParams();
 
-	const currentUserId = useCurrentUserId();
-
 	const [{ data: followees, isLoading }] = useRestApiWithAuth(
-		`/api/users/follows?profileUserId=${userId}&currentUserId=${currentUserId}`
+		`/api/users/follows?profileUserId=${userId}`
 	);
 
 	return (

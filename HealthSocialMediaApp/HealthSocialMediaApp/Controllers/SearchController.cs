@@ -18,7 +18,6 @@ namespace HealthSocialMediaApp.Controllers
             _context = context;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<System.Collections.IEnumerable>> GetSearchedUsers(string searchInput)
         {

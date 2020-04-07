@@ -1,5 +1,5 @@
 import React from "react";
-import { Route } from "react-router";
+import { Route, Switch } from "react-router";
 
 import { withLDProvider } from "launchdarkly-react-client-sdk";
 
@@ -14,6 +14,8 @@ import { UserProfile } from "./pages/UserProfile";
 import { Following } from "./pages/Following";
 import { UserFollowing } from "./pages/UserFollowing";
 import { UserFollowers } from "./pages/UserFollowers";
+import { PleaseLogIn } from "./pages/PleaseLogIn";
+import { URLNotFound } from "./pages/URLNotFound";
 
 import { Layout } from "./components/Layout";
 
@@ -24,25 +26,35 @@ function App() {
 
 	return (
 		<Layout>
-			{currentUserId && (
-				<>
-					<Route exact path="/" component={Home} />
+			<Switch>
+				<Route exact path="/" component={Home} />
+				{currentUserId && (
 					<Route path="/account" component={UserAccount} />
-					<Route path="/search" component={Search} />
-					<Route path="/user/:userId" component={UserProfile} />
-					<Route path="/follows/:userId/" component={UserFollowing} />
-					<Route
-						path="/followers/:userId/"
-						component={UserFollowers}
-					/>
+				)}
+				{!currentUserId && (
+					<Route path="/account" component={PleaseLogIn} />
+				)}
+				<Route path="/search" component={Search} />
+				<Route path="/user/:userId" component={UserProfile} />
+				<Route path="/follows/:userId/" component={UserFollowing} />
+				<Route path="/followers/:userId/" component={UserFollowers} />
+				<Route
+					path={ApplicationPaths.ApiAuthorizationPrefix}
+					component={ApiAuthorizationRoutes}
+				/>
+				<Route
+					path={ApplicationPaths.ApiAuthorizationPrefix}
+					component={ApiAuthorizationRoutes}
+				/>
+				{currentUserId && (
 					<Route path="/following" component={Following} />
-				</>
-			)}
-			<Route
-				path={ApplicationPaths.ApiAuthorizationPrefix}
-				component={ApiAuthorizationRoutes}
-			/>
-			<Route path="/privacy-policy" component={PrivacyPolicy} />
+				)}
+				{!currentUserId && (
+					<Route path="/following" component={PleaseLogIn} />
+				)}
+				<Route path="/privacy-policy" component={PrivacyPolicy} />
+				<Route path="*" component={URLNotFound} />
+			</Switch>
 		</Layout>
 	);
 }

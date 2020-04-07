@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthSocialMediaApp.Controllers
 {
-
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController
@@ -70,7 +68,7 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/users/follows/id
         [HttpGet("follows")]
-        public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollows(string profileUserId, string currentUserId)
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollows(string profileUserId)
         {
             var users = await (from user in _context.Users
                                join followerfollowee in _context.Followers on user.Id equals followerfollowee.FolloweeId
@@ -86,7 +84,7 @@ namespace HealthSocialMediaApp.Controllers
 
         // GET: api/users/follows/id
         [HttpGet("followers")]
-        public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollowers(string profileUserId, string currentUserId)
+        public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollowers(string profileUserId)
         {
             var users = await (from user in _context.Users
                                join followerfollowee in _context.Followers on user.Id equals followerfollowee.FollowerId

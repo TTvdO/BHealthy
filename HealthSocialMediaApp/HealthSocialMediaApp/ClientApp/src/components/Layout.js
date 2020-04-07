@@ -102,24 +102,31 @@ const Layout = ({ children }) => {
 					>
 						<ListItemText>Home</ListItemText>
 					</ListItem>
-					<Divider />
-					<ListItem
-						button
-						component={RouterLink}
-						to="/Following"
-						color="inherit"
-					>
-						<ListItemText>Following</ListItemText>
-					</ListItem>
-					<Divider />
-					<ListItem
-						button
-						component={RouterLink}
-						to={`/user/${currentUserId}`}
-						color="inherit"
-					>
-						<ListItemText>My Profile</ListItemText>
-					</ListItem>
+					{currentUserId && (
+						<>
+							<Divider />
+							<ListItem
+								button
+								component={RouterLink}
+								to="/Following"
+								color="inherit"
+							>
+								<ListItemText>Following</ListItemText>
+							</ListItem>
+							<Divider />
+						</>
+					)}
+
+					{currentUserId && (
+						<ListItem
+							button
+							component={RouterLink}
+							to={`/user/${currentUserId}`}
+							color="inherit"
+						>
+							<ListItemText>My Profile</ListItemText>
+						</ListItem>
+					)}
 					<Divider />
 					<ListItem
 						button
@@ -132,14 +139,16 @@ const Layout = ({ children }) => {
 					<Divider />
 					<div className={classes.grow}>
 						<div className={classes.putBottom}>
-							<ListItem
-								button
-								component={RouterLink}
-								to={`/account`}
-								color="inherit"
-							>
-								<ListItemText>My Account</ListItemText>
-							</ListItem>
+							{currentUserId && (
+								<ListItem
+									button
+									component={RouterLink}
+									to={`/account`}
+									color="inherit"
+								>
+									<ListItemText>My Account</ListItemText>
+								</ListItem>
+							)}
 							<Divider />
 							<ListItem
 								button
