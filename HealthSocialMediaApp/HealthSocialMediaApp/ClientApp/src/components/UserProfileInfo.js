@@ -89,6 +89,7 @@ const UserProfileInfo = ({
 						</Box>
 					</Box>
 				</Grid>
+				<br />
 				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
 					{!isOwnProfile && isFollowingThisUser && (
 						<Button
@@ -109,6 +110,7 @@ const UserProfileInfo = ({
 						</Button>
 					)}
 				</Grid>
+				<br />
 				<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
 					<Typography variant="body1">{user.description}</Typography>
 				</Grid>
