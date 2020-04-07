@@ -4,6 +4,8 @@ using HealthSocialMediaApp.Data;
 using Microsoft.EntityFrameworkCore;
 using HealthSocialMediaApp.Controllers;
 using System.Linq;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Routing;
 
 namespace HealthSocialMediaUnitTest
 {
@@ -88,6 +90,70 @@ namespace HealthSocialMediaUnitTest
 
             //Assert
             Assert.False(context.Followers.Any(f => f.FollowerId == user1.Id && f.FolloweeId == user2.Id));
+        }
+
+        [Fact]
+        public async void GetAllFollows()
+        {
+            // Arrange
+            #region context preperation
+            var context = DbContextCreator.CreateTestContext("UsersTestDbGetAllFollows");
+            #endregion
+
+            #region data preperation
+
+            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
+            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
+            context.Followers.Add(new FollowerFollowee { FolloweeId = user2.Id, FollowerId = user1.Id });
+            context.SaveChanges();
+            #endregion
+
+            //Act
+            UsersController usersController = new UsersController(context);
+            var users = await usersController.GetAllFollows(user1.Id,null);
+
+            //Assert
+            List<string> listIds = new List<string>();
+            foreach (var user in users.Value)
+            {
+                var dictionary = new RouteValueDictionary(user);
+                listIds.Add(dictionary["Id"] as string);
+            }
+
+            Assert.Equal(user2.Id, listIds.First());
+            Assert.Single(listIds);
+        }
+
+        [Fact]
+        public async void GetAllFollowers()
+        {
+            // Arrange
+            #region context preperation
+            var context = DbContextCreator.CreateTestContext("UsersTestDbGetAllFollowers");
+            #endregion
+
+            #region data preperation
+
+            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
+            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
+            context.Followers.Add(new FollowerFollowee { FolloweeId = user2.Id, FollowerId = user1.Id });
+            context.SaveChanges();
+            #endregion
+
+            //Act
+            UsersController usersController = new UsersController(context);
+            var users = await usersController.GetAllFollowers(user2.Id,null);
+
+            //Assert
+            List<string> listIds = new List<string>();
+            foreach (var user in users.Value)
+            {
+                var dictionary = new RouteValueDictionary(user);
+                listIds.Add(dictionary["Id"] as string);
+            }
+
+            Assert.Equal(user1.Id, listIds.First());
+            Assert.Single(listIds);
         }
 
         private ApplicationUser PutOneUserInDb(

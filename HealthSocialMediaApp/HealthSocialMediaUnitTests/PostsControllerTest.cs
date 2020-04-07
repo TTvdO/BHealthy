@@ -133,6 +133,17 @@ namespace HealthSocialMediaUnitTest
         }
 
         [Fact]
+        public async void GetNonExsistingPostById()
+        {
+            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbGetNonExsistingPostById");
+            PostsController postsController = new PostsController(_context, null);
+
+            var Result = await postsController.GetPost(2);
+
+            Assert.Null(Result.Value);
+        }
+
+        [Fact]
         public async void LikeAPost()
         {
             ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbLikeAPost");
@@ -143,6 +154,68 @@ namespace HealthSocialMediaUnitTest
 
             var likeCount = (from like in _context.Likes where like.PostId == post.Id select like.Id).Count();
 
+            Assert.Equal(1, likeCount);
+        }
+
+        [Fact]
+        public async void LikeANonExsistingPost()
+        {
+            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbLikeANonExsistingPost");
+            var post = CreateDummyData(_context);
+            PostsController postsController = new PostsController(_context, null);
+
+            //non existing post id
+            await postsController.PutPostLike(111, post.ApplicationUserId);
+
+            var likeCount = (from like in _context.Likes where like.PostId == 111 select like.Id).Count();
+
+            Assert.Equal(0, likeCount);
+        }
+
+        [Fact]
+        public async void UnLikeANonExsistingPost()
+        {
+            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbUnLikeANonExsistingPost");
+            var post = CreateDummyData(_context);
+            PostsController postsController = new PostsController(_context, null);
+
+            //non existing post id
+            await postsController.PutPostUnlike(111, post.ApplicationUserId);
+
+            var likeCount = (from like in _context.Likes where like.PostId == 111 select like.Id).Count();
+
+            Assert.Equal(0, likeCount);
+        }
+
+        [Fact]
+        public async void UnLikeAPostThatIsNotLiked()
+        {
+            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbUnLikeAPostThatIsNotLiked");
+            var post = CreateDummyData(_context);
+            PostsController postsController = new PostsController(_context, null);
+
+
+            //non existing post id
+            await postsController.PutPostUnlike(post.Id , post.ApplicationUserId);
+
+            var likeCount = (from like in _context.Likes where like.PostId == 111 select like.Id).Count();
+
+            Assert.Equal(0, likeCount);
+        }
+
+        [Fact]
+        public async void UserAlreadyLikedPost()
+        {
+            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbUserAlreadyLikedPost");
+            var post = CreateDummyData(_context);
+            PostsController postsController = new PostsController(_context, null);
+            _context.Likes.Add(new Like { ApplicationUserId = post.ApplicationUserId, PostId = post.Id });
+            _context.SaveChanges();
+
+            var a = await postsController.PutPostLike(post.Id, post.ApplicationUserId);
+
+            var likeCount = (from like in _context.Likes where like.PostId == post.Id select like.Id).Count();
+            
             Assert.Equal(1, likeCount);
         }
 
@@ -173,6 +246,19 @@ namespace HealthSocialMediaUnitTest
             await postsController.DeletePost(post.Id);
 
             Assert.False(_context.Posts.Any(e => e.Id == post.Id));
+        }
+
+        [Fact]
+        public async void DeleteNonExistingPost()
+        {
+            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbDeleteNonExistingPost");
+            var hostingEnvironment = Mock.Of<IWebHostEnvironment>(e => e.ApplicationName == "application");
+            hostingEnvironment.WebRootPath = "../";
+            PostsController postsController = new PostsController(_context, hostingEnvironment);
+
+            await postsController.DeletePost(4);
+
+            Assert.False(_context.Posts.Any());
         }
     }
 }
