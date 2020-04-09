@@ -37,6 +37,9 @@ const useStyles = makeStyles(() => ({
 	},
 	chip: {
 		marginTop: "20%"
+	},
+	siteLinks: {
+		textDecorationLine: "none !important"
 	}
 }));
 
@@ -54,7 +57,11 @@ const Posts = ({ posts, onDelete, onLikeToggle }) => {
 					</Avatar>
 				}
 				title={
-					<Link component={RouterLink} to={`/user/${post.userId}`}>
+					<Link
+						className={classes.siteLinks}
+						component={RouterLink}
+						to={`/user/${post.userId}`}
+					>
 						{post.userName}
 					</Link>
 				}
@@ -62,8 +69,9 @@ const Posts = ({ posts, onDelete, onLikeToggle }) => {
 				action={
 					<Chip
 						className={classes.chip}
-						color="secondary"
+						color="primary"
 						label={post.name}
+						style={{ color: "#FFFFFF" }}
 					/>
 				}
 			/>
@@ -89,6 +97,7 @@ const Posts = ({ posts, onDelete, onLikeToggle }) => {
 				)}
 				{currentUserId && currentUserId === post.userId && (
 					<IconButton
+						style={{ color: "red" }}
 						className={classes.delete}
 						aria-label="delete"
 						onClick={() => {

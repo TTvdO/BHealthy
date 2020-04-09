@@ -59,11 +59,19 @@ export class LoginMenu extends Component {
 	authenticatedView(userName, profilePath, logoutPath) {
 		return (
 			<>
-				<Button component={RouterLink} to={profilePath} color="inherit">
+				<Button
+					component={RouterLink}
+					to={profilePath}
+					color="secondary"
+				>
 					{userName}
 				</Button>
 
-				<Button component={RouterLink} to={logoutPath} color="inherit">
+				<Button
+					component={RouterLink}
+					to={logoutPath}
+					color="secondary"
+				>
 					Logout
 				</Button>
 			</>
@@ -76,11 +84,11 @@ export class LoginMenu extends Component {
 				<Button
 					component={RouterLink}
 					to={registerPath}
-					color="inherit"
+					color="secondary"
 				>
 					Register
 				</Button>
-				<Button component={RouterLink} to={loginPath} color="inherit">
+				<Button component={RouterLink} to={loginPath} color="secondary">
 					Login
 				</Button>
 			</>

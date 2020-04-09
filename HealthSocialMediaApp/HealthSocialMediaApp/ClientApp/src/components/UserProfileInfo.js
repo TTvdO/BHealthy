@@ -18,15 +18,19 @@ const useStyles = makeStyles(theme => ({
 		backgroundColor: blue[500]
 	},
 	profileInfo: {
+		marginTop: "8px",
 		[theme.breakpoints.down("sm")]: {
-			flexDirection: "column"
+			justifyContent: "space-evenly"
 		}
 	},
 	profileInfoItem: {
 		marginRight: "1rem",
 		[theme.breakpoints.down("sm")]: {
-			marginRight: "initial"
+			marginRight: "0px"
 		}
+	},
+	siteLinks: {
+		textDecorationLine: "none !important"
 	}
 }));
 
@@ -61,36 +65,40 @@ const UserProfileInfo = ({
 							<Typography variant="h6">Posts</Typography>
 							<Typography>{amountOfPosts}</Typography>
 						</Box>
-						<Box className={classes.profileInfoItem}>
-							<Typography>
-								<Link
-									component={RouterLink}
-									to={`/follows/${user.id}`}
-									key={user.id}
-								>
+						<Link
+							component={RouterLink}
+							to={`/follows/${user.id}`}
+							key={user.id}
+							className={classes.siteLinks}
+							color="inherit"
+						>
+							<Box className={classes.profileInfoItem}>
+								<Typography>
 									<Typography variant="h6">
 										Follows
 									</Typography>
-								</Link>
-							</Typography>
-							<Typography>{user.followees.length}</Typography>
-						</Box>
-						<Box className={classes.profileInfoItem}>
+								</Typography>
+								<Typography>{user.followees.length}</Typography>
+							</Box>
+						</Link>
+						<Link
+							component={RouterLink}
+							to={`/followers/${user.id}`}
+							key={user.id}
+							className={classes.siteLinks}
+							color="inherit"
+						>
 							<Box className={classes.profileInfoItem}>
-								<Typography>
-									<Link
-										component={RouterLink}
-										to={`/followers/${user.id}`}
-										key={user.id}
-									>
+								<Box className={classes.profileInfoItem}>
+									<Typography>
 										<Typography variant="h6">
 											Followers
 										</Typography>
-									</Link>
-								</Typography>
+									</Typography>
+								</Box>
+								<Typography>{user.followers.length}</Typography>
 							</Box>
-							<Typography>{user.followers.length}</Typography>
-						</Box>
+						</Link>
 					</Box>
 				</Grid>
 				<br />
@@ -112,6 +120,7 @@ const UserProfileInfo = ({
 							<Button
 								variant="contained"
 								color="primary"
+								style={{ color: "#FFFFFF" }}
 								onClick={onFollow}
 							>
 								Follow

@@ -176,7 +176,9 @@ const PostCreate = ({ onCreate }) => {
 								onClick={createPost}
 								disabled={getIsSubmitDisabled()}
 							>
-								Create post
+								<Typography color="secondary" variant="button">
+									Create post
+								</Typography>
 							</Button>
 						</div>
 					</form>
