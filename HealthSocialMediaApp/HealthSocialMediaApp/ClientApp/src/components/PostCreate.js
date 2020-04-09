@@ -88,6 +88,7 @@ const PostCreate = ({ onCreate }) => {
 		setImageFile(null);
 		setDescription("");
 		setSelectedCategory(0);
+		setImageLink("");
 	};
 
 	const getIsSubmitDisabled = () => {

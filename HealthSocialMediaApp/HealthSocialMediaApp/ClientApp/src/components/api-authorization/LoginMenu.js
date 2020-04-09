@@ -5,6 +5,8 @@ import { ApplicationPaths } from "./ApiAuthorizationConstants";
 
 import { Button } from "@material-ui/core";
 
+import { fetchJsonWithAuth } from "../../hooks/useRestApiWithAuth";
+
 export class LoginMenu extends Component {
 	constructor(props) {
 		super(props);
@@ -29,9 +31,12 @@ export class LoginMenu extends Component {
 			authService.isAuthenticated(),
 			authService.getUser()
 		]);
+
+		const currentUser = await fetchJsonWithAuth(`/api/users/${user.sub}`);
+
 		this.setState({
 			isAuthenticated,
-			userName: user && user.name
+			userName: currentUser.userName
 		});
 	}
 

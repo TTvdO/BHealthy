@@ -10,19 +10,19 @@ const getAuthorizationHeaders = token => {
 		: {};
 };
 
-const fetchWithAuth = async (requestInfo, requestInit = { headers: {} }) => {
+const fetchWithAuth = async (input, init = { headers: {} }) => {
 	const token = await authService.getAccessToken();
 
-	const requestInitWithAuthHeaders = {
-		...requestInit,
-		headers: { ...requestInit.headers, ...getAuthorizationHeaders(token) }
+	const initWithAuthHeaders = {
+		...init,
+		headers: { ...init.headers, ...getAuthorizationHeaders(token) }
 	};
 
-	return await fetch(requestInfo, requestInitWithAuthHeaders);
+	return await fetch(input, initWithAuthHeaders);
 };
 
-const fetchJsonWithAuth = async (requestInfo, requestInit) => {
-	const response = await fetchWithAuth(requestInfo, requestInit);
+const fetchJsonWithAuth = async (input, init) => {
+	const response = await fetchWithAuth(input, init);
 
 	return await response.json();
 };
