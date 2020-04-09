@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthSocialMediaApp.Models;
-using HealthSocialMediaApp.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HealthSocialMediaApp.Data;
+using HealthSocialMediaApp.Models;
 
 
 namespace HealthSocialMediaApp.Controllers
@@ -68,6 +69,11 @@ namespace HealthSocialMediaApp.Controllers
         [HttpPut("{id}/like")]
         public async Task<ActionResult<Post>> PutPostLike(int id, string userId)
         {
+            if (!IsAuthenticatedUser(userId))
+            {
+                return Forbid();
+            }
+
             var post = await _context.Posts.FindAsync(id);
 
             if (post == null)
@@ -96,7 +102,7 @@ namespace HealthSocialMediaApp.Controllers
             _context.Likes.Add(correspondingLike);
             await _context.SaveChangesAsync();
 
-            return StatusCode(200);
+            return Ok();
         }
 
         // PUT: api/Posts/5/unlike
@@ -104,6 +110,11 @@ namespace HealthSocialMediaApp.Controllers
         [HttpPut("{id}/unlike")]
         public async Task<ActionResult<Post>> PutPostUnlike(int id, string userId)
         {
+            if (!IsAuthenticatedUser(userId))
+            {
+                return Forbid();
+            }
+
             var post = await _context.Posts.FindAsync(id);
 
             if (post == null)
@@ -128,7 +139,7 @@ namespace HealthSocialMediaApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return StatusCode(200);
+            return Ok();
         }
 
 
@@ -137,6 +148,11 @@ namespace HealthSocialMediaApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Post>> PostPost([FromBody] Post post)
         {
+            if (!IsAuthenticatedUser(post.ApplicationUserId))
+            {
+                return Forbid();
+            }
+
             if (post.CategoryId == 0)
             {
                 post.CategoryId = -7;
@@ -147,7 +163,7 @@ namespace HealthSocialMediaApp.Controllers
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
-            return StatusCode(201);
+            return Ok();
         }
 
         // DELETE: api/Posts/5
@@ -156,18 +172,29 @@ namespace HealthSocialMediaApp.Controllers
         public async Task<ActionResult<Post>> DeletePost(int id)
         {
             var post = await _context.Posts.FindAsync(id);
+
             if (post == null)
             {
                 return NotFound();
             }
 
-            // Delete image from dir
+            if (!IsAuthenticatedUser(post.ApplicationUserId))
+            {
+                return Forbid();
+            }
+
             ImagesController.DeleteImage(post.ImageLink, _hostingEnv);
 
             _context.Posts.Remove(post);
+
             await _context.SaveChangesAsync();
 
             return post;
+        }
+
+        private bool IsAuthenticatedUser(string userId)
+        {
+            return userId == User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
     }
 }

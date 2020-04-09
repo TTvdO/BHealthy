@@ -1,10 +1,10 @@
-using HealthSocialMediaApp.Data;
-using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using IdentityServer4.EntityFramework.Options;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using HealthSocialMediaApp.Data;
+using IdentityServer4.EntityFramework.Options;
 
-namespace HealthSocialMediaUnitTest
+namespace HealthSocialMediaUnitTest.Utilities
 {
     /// <summary>
     /// Use this class to instantiate a db context. It ensures there are no duplicate db context names

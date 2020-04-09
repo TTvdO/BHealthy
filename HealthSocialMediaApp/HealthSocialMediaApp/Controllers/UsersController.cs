@@ -1,10 +1,12 @@
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HealthSocialMediaApp.Models;
 using HealthSocialMediaApp.Data;
-using Microsoft.AspNetCore.Authorization;
+using HealthSocialMediaApp.Models;
+
 
 namespace HealthSocialMediaApp.Controllers
 {
@@ -33,7 +35,6 @@ namespace HealthSocialMediaApp.Controllers
                                   u.Id,
                                   u.UserName,
                                   u.Description,
-                                  u.Email,
                                   followers,
                                   followees
                               }
@@ -47,10 +48,43 @@ namespace HealthSocialMediaApp.Controllers
             return user;
         }
 
+        [HttpGet("account/{id}")]
+        public async Task<ActionResult<object>> GetUserAccount(string id)
+        {
+            if (!IsAuthenticatedUser(id))
+            {
+                return Forbid();
+            }
+
+            var user = await (from u in _context.Users
+                              where u.Id == id
+                              select new
+                              {
+                                  u.Id,
+                                  u.UserName,
+                                  u.Description,
+                                  u.Email
+                              }
+            ).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
+
         // PUT: api/users
+        [Authorize]
         [HttpPut]
         public async Task<IActionResult> PutApplicationUser([FromBody] ApplicationUser editedUser)
         {
+            if (!IsAuthenticatedUser(editedUser.Id))
+            {
+                return Forbid();
+            }
+
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == editedUser.Id);
 
             if (user == null)
@@ -63,7 +97,7 @@ namespace HealthSocialMediaApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return StatusCode(200);
+            return Ok();
         }
 
         // GET: api/users/follows/id
@@ -82,7 +116,7 @@ namespace HealthSocialMediaApp.Controllers
             return users;
         }
 
-        // GET: api/users/follows/id
+        // GET: api/users/followers/id
         [HttpGet("followers")]
         public async Task<ActionResult<System.Collections.IEnumerable>> GetAllFollowers(string profileUserId)
         {
@@ -99,17 +133,23 @@ namespace HealthSocialMediaApp.Controllers
         }
 
         // PUT: api/users/follow
+        [Authorize]
         [HttpPut("follow")]
-        public async Task<IActionResult> PutFollow(string followerid, string followeeId)
+        public async Task<IActionResult> PutFollow(string followerId, string followeeId)
         {
-            if (followeeId == followerid)
+            if (!IsAuthenticatedUser(followerId))
+            {
+                return Forbid();
+            }
+
+            if (followeeId == followerId)
             {
                 return BadRequest();
             }
 
             var follow = new FollowerFollowee
             {
-                FollowerId = followerid,
+                FollowerId = followerId,
                 FolloweeId = followeeId
             };
 
@@ -121,7 +161,7 @@ namespace HealthSocialMediaApp.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(followerid))
+                if (!UserExists(followerId))
                 {
                     return NotFound();
                 }
@@ -131,13 +171,19 @@ namespace HealthSocialMediaApp.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok();
         }
 
         // PUT: api/users/unfollow
+        [Authorize]
         [HttpPut("unfollow")]
         public async Task<IActionResult> PutUnFollow(string followerId, string followeeId)
         {
+            if (!IsAuthenticatedUser(followerId))
+            {
+                return Forbid();
+            }
+
             FollowerFollowee follow = _context.Followers.Where(o => o.FollowerId == followerId && o.FolloweeId == followeeId).FirstOrDefault();
 
             if (follow == null)
@@ -163,12 +209,17 @@ namespace HealthSocialMediaApp.Controllers
                 }
             }
 
-            return StatusCode(200);
+            return Ok();
         }
 
         private bool UserExists(string id)
         {
             return _context.Users.Any(a => a.Id == id);
+        }
+
+        private bool IsAuthenticatedUser(string userId)
+        {
+            return userId == User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
     }
 }

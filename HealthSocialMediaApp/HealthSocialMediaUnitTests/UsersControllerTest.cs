@@ -1,16 +1,37 @@
-﻿using Xunit;
-using HealthSocialMediaApp.Models;
-using HealthSocialMediaApp.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using HealthSocialMediaApp.Controllers;
-using System.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Routing;
+using HealthSocialMediaApp.Data;
+using HealthSocialMediaApp.Models;
+using HealthSocialMediaUnitTest.Utilities;
+using Xunit;
 
 namespace HealthSocialMediaUnitTest
 {
     public class UserControllerTest
     {
+        private UsersController CreateUsersController(ApplicationDbContext dbContext, string currentUserId)
+        {
+            var postsController = new UsersController(dbContext);
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, currentUserId),
+            }, "mock"));
+
+            postsController.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext() { User = user }
+            };
+
+            return postsController;
+        }
+
         [Fact]
         public async void UserIsUpdated()
         {
@@ -21,25 +42,23 @@ namespace HealthSocialMediaUnitTest
 
             #region data preperation
             ApplicationUser user = PutOneUserInDb(context);
-            string updatedUserName = "Slippin Jimmy";
-            string updatedDescription = "Need a will? Call McGill.";
             var updatedUser = new ApplicationUser
             {
                 Id = user.Id,
-                UserName = updatedUserName,
-                Description = updatedDescription,
+                UserName = "Slippin Jimmy",
+                Description = "Need a will? Call McGill.",
             };
 
             #endregion
 
             // Act
-            UsersController usersController = new UsersController(context);
+            UsersController usersController = CreateUsersController(context, updatedUser.Id);
             var result = await usersController.PutApplicationUser(updatedUser);
 
             // Assert
             var storedData = await context.Users.SingleAsync(u => u.Id == user.Id);
-            Assert.Equal(updatedUserName, storedData.UserName);
-            Assert.Equal(updatedDescription, storedData.Description);
+            Assert.Equal(updatedUser.UserName, storedData.UserName);
+            Assert.Equal(updatedUser.Description, storedData.Description);
 
             var actualUser = await usersController.GetUser(user.Id);
             Assert.NotNull(actualUser);
@@ -55,16 +74,16 @@ namespace HealthSocialMediaUnitTest
 
             #region data preperation
 
-            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
-            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
+            ApplicationUser follower = PutOneUserInDb(context, "first", "john");
+            ApplicationUser followee = PutOneUserInDb(context, "second", "oh Hi mark");
             #endregion
 
             //Act
-            UsersController usersController = new UsersController(context);
-            await usersController.PutFollow(user1.Id, user2.Id);
+            UsersController usersController = CreateUsersController(context, follower.Id);
+            await usersController.PutFollow(follower.Id, followee.Id);
 
             //Assert
-            Assert.True(context.Followers.Any(f => f.FollowerId == user1.Id && f.FolloweeId == user2.Id));
+            Assert.True(context.Followers.Any(f => f.FollowerId == follower.Id && f.FolloweeId == followee.Id));
 
         }
 
@@ -78,18 +97,18 @@ namespace HealthSocialMediaUnitTest
 
             #region data preperation
 
-            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
-            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
-            context.Followers.Add(new FollowerFollowee { FolloweeId = user2.Id, FollowerId = user1.Id });
+            ApplicationUser follower = PutOneUserInDb(context, "first", "john");
+            ApplicationUser followee = PutOneUserInDb(context, "second", "oh Hi mark");
+            context.Followers.Add(new FollowerFollowee { FolloweeId = followee.Id, FollowerId = follower.Id });
             context.SaveChanges();
             #endregion
 
             //Act
-            UsersController usersController = new UsersController(context);
-            await usersController.PutUnFollow(user1.Id, user2.Id);
+            UsersController usersController = CreateUsersController(context, follower.Id);
+            await usersController.PutUnFollow(follower.Id, followee.Id);
 
             //Assert
-            Assert.False(context.Followers.Any(f => f.FollowerId == user1.Id && f.FolloweeId == user2.Id));
+            Assert.False(context.Followers.Any(f => f.FollowerId == follower.Id && f.FolloweeId == followee.Id));
         }
 
         [Fact]
@@ -102,15 +121,15 @@ namespace HealthSocialMediaUnitTest
 
             #region data preperation
 
-            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
-            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
-            context.Followers.Add(new FollowerFollowee { FolloweeId = user2.Id, FollowerId = user1.Id });
+            ApplicationUser follower = PutOneUserInDb(context, "first", "john");
+            ApplicationUser followee = PutOneUserInDb(context, "second", "oh Hi mark");
+            context.Followers.Add(new FollowerFollowee { FolloweeId = followee.Id, FollowerId = follower.Id });
             context.SaveChanges();
             #endregion
 
             //Act
-            UsersController usersController = new UsersController(context);
-            var users = await usersController.GetAllFollows(user1.Id);
+            UsersController usersController = CreateUsersController(context, follower.Id);
+            var users = await usersController.GetAllFollows(follower.Id);
 
             //Assert
             List<string> listIds = new List<string>();
@@ -120,7 +139,7 @@ namespace HealthSocialMediaUnitTest
                 listIds.Add(dictionary["Id"] as string);
             }
 
-            Assert.Equal(user2.Id, listIds.First());
+            Assert.Equal(followee.Id, listIds.First());
             Assert.Single(listIds);
         }
 
@@ -134,15 +153,15 @@ namespace HealthSocialMediaUnitTest
 
             #region data preperation
 
-            ApplicationUser user1 = PutOneUserInDb(context, "first", "john");
-            ApplicationUser user2 = PutOneUserInDb(context, "second", "oh Hi mark");
-            context.Followers.Add(new FollowerFollowee { FolloweeId = user2.Id, FollowerId = user1.Id });
+            ApplicationUser follower = PutOneUserInDb(context, "first", "john");
+            ApplicationUser followee = PutOneUserInDb(context, "second", "oh Hi mark");
+            context.Followers.Add(new FollowerFollowee { FolloweeId = followee.Id, FollowerId = follower.Id });
             context.SaveChanges();
             #endregion
 
             //Act
-            UsersController usersController = new UsersController(context);
-            var users = await usersController.GetAllFollowers(user2.Id);
+            UsersController usersController = CreateUsersController(context, follower.Id);
+            var users = await usersController.GetAllFollowers(followee.Id);
 
             //Assert
             List<string> listIds = new List<string>();
@@ -152,7 +171,7 @@ namespace HealthSocialMediaUnitTest
                 listIds.Add(dictionary["Id"] as string);
             }
 
-            Assert.Equal(user1.Id, listIds.First());
+            Assert.Equal(follower.Id, listIds.First());
             Assert.Single(listIds);
         }
 

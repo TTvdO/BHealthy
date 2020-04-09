@@ -10,7 +10,7 @@ const UserAccount = () => {
 	const [userData, setUserData] = useState({});
 
 	useEffect(() => {
-		fetchJsonWithAuth(`/api/users/${currentUserId}`).then(user => {
+		fetchJsonWithAuth(`/api/users/account/${currentUserId}`).then(user => {
 			setUserData(user);
 		});
 	}, [setUserData, currentUserId]);

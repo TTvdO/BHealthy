@@ -1,7 +1,7 @@
-using Xunit;
 using HealthSocialMediaApp.Data;
+using Xunit;
 
-namespace HealthSocialMediaUnitTest
+namespace HealthSocialMediaUnitTest.Utilities
 {
     public class DbContextCreatorTest
     {

@@ -1,264 +1,309 @@
-using Xunit;
-using HealthSocialMediaApp.Models;
-using HealthSocialMediaApp.Data;
 using System;
-using System.Linq;
-using HealthSocialMediaApp.Controllers;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Routing;
-using Moq;
+using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using HealthSocialMediaApp.Controllers;
+using HealthSocialMediaApp.Data;
+using HealthSocialMediaApp.Models;
+using HealthSocialMediaUnitTest.Utilities;
+using Moq;
+using Xunit;
 
 namespace HealthSocialMediaUnitTest
 {
     public class PostsControllerTests
     {
         #region setup
-
-        public Post CreateDummyData(ApplicationDbContext _context)
+        private int postId = 1;
+        public Post CreateDummyPost(string userId, int categoryId)
         {
-            var user = CreateDummyUser("Person", _context);
-            var category = CreateDummyCategory(12, _context);
-            var description = "My new shoes";
-            var imageLink = "../images/example.jpg";
-            DateTime createdAt = new DateTime(2019, 3, 25);
-
-            var post = new Post
+            var user = CreateDummyUser(userId);
+            postId += 1;
+            return new Post
             {
-                Id = 12,
+                Id = postId,
                 ApplicationUserId = user.Id,
-                CategoryId = category.Id,
-                Description = description,
-                ImageLink = imageLink,
-                CreatedAt = createdAt
+                CategoryId = categoryId,
+                Description = "My new shoes",
+                ImageLink = "../images/example.jpg"
             };
-
-            _context.Posts.Add(post);
-            _context.SaveChanges();
-            return post;
         }
 
-        private ApplicationUser CreateDummyUser(string id, ApplicationDbContext _context)
+        private ApplicationUser CreateDummyUser(string id)
         {
-            var appUser = new ApplicationUser
+            return new ApplicationUser
             {
                 Email = "Jimmy@mail.com",
                 UserName = "Jimmy",
                 Description = "My fitness account",
                 Id = id
             };
-
-            _context.Users.Add(appUser);
-            _context.SaveChanges();
-
-            return appUser;
         }
 
-        private Category CreateDummyCategory(int id, ApplicationDbContext _context)
+        private Category CreateDummyCategory(int id)
         {
-            var category = new Category { Id = id, Name = "General" };
-            _context.Categories.Add(category);
-            _context.SaveChanges();
-            return category;
+            return new Category { Id = id, Name = "General" };
         }
+
+        private PostsController CreatePostsController(ApplicationDbContext dbContext, string currentUserId)
+        {
+            var hostingEnvironment = Mock.Of<IWebHostEnvironment>(e => e.ApplicationName == "application");
+            hostingEnvironment.WebRootPath = "../";
+
+            var postsController = new PostsController(dbContext, hostingEnvironment);
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, currentUserId),
+            }, "mock"));
+
+            postsController.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext() { User = user }
+            };
+
+            return postsController;
+        }
+
         #endregion
-
-        [Fact]
-        public void PostExists()
-        {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbPostExists");
-            var post = CreateDummyData(_context);
-
-            Assert.True(_context.Posts.Any(e => e.Id == post.Id));
-        }
 
         [Fact]
         public async void PostsInCorrectOrder()
         {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbPostsInCorrectOrder");
-            var user = CreateDummyUser("Danny", _context);
-            var category = CreateDummyCategory(12, _context);
-            var description = "My new shoes";
-            var imageLink = "../images/example.jpg";
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbPostsInCorrectOrder");
+            string authenticatedUserId = "current-user-id";
+            var user = CreateDummyUser(authenticatedUserId);
+            var category = CreateDummyCategory(1);
+            context.Users.Add(user);
+            context.Categories.Add(category);
+            await context.SaveChangesAsync();
 
-            var postOld = new Post
-            {
-                Id = 14,
-                ApplicationUserId = user.Id,
-                CategoryId = category.Id,
-                Description = description,
-                ImageLink = imageLink
-            };
-            var postNew = new Post
-            {
-                Id = 15,
-                ApplicationUserId = user.Id,
-                CategoryId = category.Id,
-                Description = description,
-                ImageLink = imageLink
-            };
+            var postsController = CreatePostsController(context, authenticatedUserId);
 
-            //act
-            PostsController postsController = new PostsController(_context, null);
+            var postOld = CreateDummyPost(user.Id, category.Id);
+            var postNew = CreateDummyPost(user.Id, category.Id);
             await postsController.PostPost(postOld);
             await postsController.PostPost(postNew);
 
-            postNew = _context.Posts.Where(p => p.Id == 15).FirstOrDefault();
-            postNew.CreatedAt = postNew.CreatedAt.AddSeconds(1);
-            _context.Posts.Update(postNew);
-            _context.SaveChanges();
-
-            //assert
-            var posts = await postsController.GetPosts(null, null, null);
-            List<Nullable<int>> listIds = new List<Nullable<int>>();
-            foreach (var post in posts.Value)
+            var response = await postsController.GetPosts(null, null, null);
+            var listIds = new List<Nullable<int>>();
+            foreach (var post in response.Value)
             {
                 var dictionary = new RouteValueDictionary(post);
                 listIds.Add(dictionary["Id"] as Nullable<int>);
             }
 
-            Assert.Equal(15, listIds.First());
+            Assert.Equal(postNew.Id, listIds.First());
         }
 
         [Fact]
-        public async void GetPostById()
+        public async void CanGetPostById()
         {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbGetPostById");
-            var Expected = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbGetPostById");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
 
-            var Result = await postsController.GetPost(Expected.Id);
+            var postsController = CreatePostsController(context, authenticatedUserId);
 
-            Assert.Equal(Expected, Result.Value);
+            var response = await postsController.GetPost(post.Id);
+
+            Assert.Equal(post, response.Value);
         }
 
         [Fact]
-        public async void GetNonExsistingPostById()
+        public async void CantGetNonExistingPostById()
         {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbGetNonExsistingPostById");
-            PostsController postsController = new PostsController(_context, null);
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbGetNonExistingPostById");
+            string authenticatedUserId = "current-user-id";
+            var postsController = CreatePostsController(context, authenticatedUserId);
 
-            var Result = await postsController.GetPost(2);
+            var response = await postsController.GetPost(2);
 
-            Assert.Null(Result.Value);
+            Assert.IsAssignableFrom<NotFoundResult>(response.Result);
         }
 
         [Fact]
-        public async void LikeAPost()
+        public async void CanLikeAndUnlikeAPost()
         {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbLikeAPost");
-            var post = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("CanLikeAndUnlikeAPost");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
+
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            var initialLikeCount = (from like in context.Likes where like.PostId == post.Id select like.Id).Count();
+            Assert.Equal(0, initialLikeCount);
 
             await postsController.PutPostLike(post.Id, post.ApplicationUserId);
 
-            var likeCount = (from like in _context.Likes where like.PostId == post.Id select like.Id).Count();
+            var likeCountAfterLike = (from like in context.Likes where like.PostId == post.Id select like.Id).Count();
 
-            Assert.Equal(1, likeCount);
-        }
-
-        [Fact]
-        public async void LikeANonExsistingPost()
-        {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbLikeANonExsistingPost");
-            var post = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
-
-            //non existing post id
-            await postsController.PutPostLike(111, post.ApplicationUserId);
-
-            var likeCount = (from like in _context.Likes where like.PostId == 111 select like.Id).Count();
-
-            Assert.Equal(0, likeCount);
-        }
-
-        [Fact]
-        public async void UnLikeANonExsistingPost()
-        {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbUnLikeANonExsistingPost");
-            var post = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
-
-            //non existing post id
-            await postsController.PutPostUnlike(111, post.ApplicationUserId);
-
-            var likeCount = (from like in _context.Likes where like.PostId == 111 select like.Id).Count();
-
-            Assert.Equal(0, likeCount);
-        }
-
-        [Fact]
-        public async void UnLikeAPostThatIsNotLiked()
-        {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbUnLikeAPostThatIsNotLiked");
-            var post = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
-
-
-            //non existing post id
-            await postsController.PutPostUnlike(post.Id , post.ApplicationUserId);
-
-            var likeCount = (from like in _context.Likes where like.PostId == 111 select like.Id).Count();
-
-            Assert.Equal(0, likeCount);
-        }
-
-        [Fact]
-        public async void UserAlreadyLikedPost()
-        {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbUserAlreadyLikedPost");
-            var post = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
-            _context.Likes.Add(new Like { ApplicationUserId = post.ApplicationUserId, PostId = post.Id });
-            _context.SaveChanges();
-
-            var a = await postsController.PutPostLike(post.Id, post.ApplicationUserId);
-
-            var likeCount = (from like in _context.Likes where like.PostId == post.Id select like.Id).Count();
-            
-            Assert.Equal(1, likeCount);
-        }
-
-        [Fact]
-        public async void UnLikeAPost()
-        {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("tesDb5");
-            var post = CreateDummyData(_context);
-            PostsController postsController = new PostsController(_context, null);
-            _context.Likes.Add(new Like { ApplicationUserId = post.ApplicationUserId, PostId = post.Id });
+            Assert.Equal(1, likeCountAfterLike);
 
             await postsController.PutPostUnlike(post.Id, post.ApplicationUserId);
 
-            var likeCount = (from like in _context.Likes where like.PostId == post.Id select like.Id).Count();
+            var likeCountAfterUnlike = (from like in context.Likes where like.PostId == post.Id select like.Id).Count();
+            Assert.Equal(0, initialLikeCount);
+        }
+
+        [Fact]
+        public async void CantLikeANonExistingPost()
+        {
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbLikeANonExistingPost");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            int nonExistingPostId = 111;
+            var response = await postsController.PutPostLike(nonExistingPostId, post.ApplicationUserId);
+
+            Assert.IsAssignableFrom<BadRequestResult>(response.Result);
+        }
+
+        [Fact]
+        public async void CantUnLikeANonExistingPost()
+        {
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbUnLikeANonExistingPost");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            int nonExistingPostId = 111;
+            var response = await postsController.PutPostUnlike(nonExistingPostId, post.ApplicationUserId);
+
+            Assert.IsAssignableFrom<BadRequestResult>(response.Result);
+        }
+
+        [Fact]
+        public async void CantUnLikeAPostThatIsNotLiked()
+        {
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbUnLikeAPostThatIsNotLiked");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
+
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            await postsController.PutPostUnlike(post.Id, post.ApplicationUserId);
+
+            var likeCount = (from like in context.Likes where like.PostId == 111 select like.Id).Count();
 
             Assert.Equal(0, likeCount);
         }
 
         [Fact]
-        public async void DeletePost()
+        public async void CantLikeALikedPost()
         {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("tesDb6");
-            var post = CreateDummyData(_context);
-            var hostingEnvironment = Mock.Of<IWebHostEnvironment>(e => e.ApplicationName == "application");
-            hostingEnvironment.WebRootPath = "../";
-            PostsController postsController = new PostsController(_context, hostingEnvironment);
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostsTestDbUserAlreadyLikedPost");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            context.Likes.Add(new Like { ApplicationUserId = post.ApplicationUserId, PostId = post.Id });
+            await context.SaveChangesAsync();
 
-            await postsController.DeletePost(post.Id);
+            var postsController = CreatePostsController(context, authenticatedUserId);
 
-            Assert.False(_context.Posts.Any(e => e.Id == post.Id));
+            var response = await postsController.PutPostLike(post.Id, post.ApplicationUserId);
+
+            Assert.IsAssignableFrom<BadRequestResult>(response.Result);
         }
 
         [Fact]
-        public async void DeleteNonExistingPost()
+        public async void CanDeletePostOwnedByUser()
         {
-            ApplicationDbContext _context = DbContextCreator.CreateTestContext("PostsTestDbDeleteNonExistingPost");
-            var hostingEnvironment = Mock.Of<IWebHostEnvironment>(e => e.ApplicationName == "application");
-            hostingEnvironment.WebRootPath = "../";
-            PostsController postsController = new PostsController(_context, hostingEnvironment);
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("postControllerTestCanDeletePost");
+            string authenticatedUserId = "current-user-id";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost(authenticatedUserId, category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
 
-            await postsController.DeletePost(4);
+            var postsController = CreatePostsController(context, authenticatedUserId);
 
-            Assert.False(_context.Posts.Any());
+            Assert.True(context.Posts.Any(e => e.Id == post.Id));
+
+            await postsController.DeletePost(post.Id);
+
+            Assert.False(context.Posts.Any(e => e.Id == post.Id));
+        }
+
+        [Fact]
+        public async void DeletingNonExistingPostsIsHandled()
+        {
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("DeletingNonExistingPostsIsHandled");
+            string authenticatedUserId = "current-user-id";
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            int idToDelete = 4;
+
+            Assert.False(context.Posts.Any(e => e.Id == idToDelete));
+            var response = await postsController.DeletePost(idToDelete);
+
+            Assert.IsAssignableFrom<NotFoundResult>(response.Result);
+        }
+
+        [Fact]
+        public async void CanNotDeletePostOwnedByOtherUser()
+        {
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostControllerTestCanNotDeletePostOwnerByOtherUser");
+            string authenticatedUserId = "hackerman";
+            var category = CreateDummyCategory(1);
+            var post = CreateDummyPost("another-user", category.Id);
+            context.Categories.Add(category);
+            context.Posts.Add(post);
+            await context.SaveChangesAsync();
+
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            Assert.True(context.Posts.Any(e => e.Id == post.Id));
+
+            var response = await postsController.DeletePost(post.Id);
+
+            Assert.True(context.Posts.Any(e => e.Id == post.Id));
+            Assert.IsAssignableFrom<ForbidResult>(response.Result);
+        }
+
+        [Fact]
+        public async void CanNotCreatePostAsOtherUser()
+        {
+            ApplicationDbContext context = DbContextCreator.CreateTestContext("PostControllerTestCanNotCreatePostAsOtherUser");
+            string authenticatedUserId = "hackerman";
+            var category = CreateDummyCategory(1);
+            context.Categories.Add(category);
+            await context.SaveChangesAsync();
+
+            var postsController = CreatePostsController(context, authenticatedUserId);
+
+            var response = await postsController.PostPost(CreateDummyPost("another-user", 1));
+
+            Assert.True(context.Posts.Count() == 0);
+            Assert.IsAssignableFrom<ForbidResult>(response.Result);
         }
     }
 }
