@@ -1,7 +1,5 @@
 # BHealthy
 
-[![Build status](https://dev.azure.com/hhs-se-s6/Group%204/_apis/build/status/BHealthy.CI)](https://dev.azure.com/hhs-se-s6/Group%204/_build/latest?definitionId=6)
-
 ## Introduction
 
 BHealthy is a social medium application that aims to improve the lives of health enthusiasts.
