@@ -8,18 +8,6 @@ BHealthy is a social medium application that aims to improve the lives of health
 
 ### 1. Clone the repository
 
-Over http
-
-```bash
-git clone https://hhs-se-s6@dev.azure.com/hhs-se-s6/Group%204/_git/Group%204
-```
-
-Over ssh
-
-```bash
-git clone git@ssh.dev.azure.com:v3/hhs-se-s6/Group%204/Group%204
-```
-
 ### 2. Initialize user secrets.
 
 Used for the Google Authentication API. Replace CLIENT_ID and CLIENT_SECRET with the development API key's for Google Authentication.
